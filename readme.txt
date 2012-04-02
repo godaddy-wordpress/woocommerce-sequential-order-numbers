@@ -26,7 +26,7 @@ This plugin extends the WooCommerce e-commerce plugin by setting sequential orde
 
 == Changelog ==
 
-= 1.0.1 =
+= 1.1.0 =
 * Search by order number
 
 = 1.0.1 =
