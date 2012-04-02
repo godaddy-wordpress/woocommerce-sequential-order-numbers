@@ -1,0 +1,30 @@
+=== WooCommerce Sequential Order Numbers ===
+Contributors: FoxRunSoftware
+Tags: woocommerce, order number
+Requires at least: 3.3
+Tested up to: 3.3
+Stable tag: 1.0.0
+
+This plugin extends the WooCommerce e-commerce plugin by setting sequential order numbers for new orders.
+
+== Description ==
+
+This plugin extends the WooCommerce e-commerce plugin by setting sequential order numbers for new orders.  If there are existing orders at the time of installation, the sequential order numbers will start with the highest current order number.
+
+= Feedback =
+* I am open to your suggestions and feedback - Thank you for using or trying out one of my plugins!
+* Drop me a line at [www.foxrunsoftware.com](http://www.foxrunsoftware.com)
+
+= More =
+* Vist the [WooCommerce Sequential Order Number plugin page](http://www.foxrunsoftware.net/articles/wordpress/woocommerce-sequential-order-numbers/) for further details and a discussion of the implementation.  [Also see my other plugins](http://www.foxrunsoftware.com) or see [my WordPress.org profile page](http://profiles.wordpress.org/foxrunsoftware/)
+
+== Installation ==
+
+1. Upload the entire 'woocommerce-seq-order-number' folder to the '/wp-content/plugins/' directory
+2. Activate the plugin through the 'Plugins' menu in WordPress
+3. Order numbers will continue sequentially from the current highest order number, or from 1 if no orders have been placed yet
+
+== Changelog ==
+
+= 1.0.0 =
+* Initial Release
