@@ -5,7 +5,7 @@ Plugin URI: http://www.foxrunsoftware.net/articles/wordpress/woocommerce-sequent
 Description: Provides sequential order numbers for WooCommerce orders
 Author: Justin Stern
 Author URI: http://www.foxrunsoftware.net
-Version: 1.0.1
+Version: 1.1.0
 
 	Copyright: © 2012 Justin Stern (email : justin@foxrunsoftware.net)
 	License: GNU General Public License v3.0
@@ -22,7 +22,7 @@ if (is_woocommerce_active()) {
 	if (!class_exists('WC_Seq_Order_Number')) {
 	 
 		class WC_Seq_Order_Number {
-			const VERSION = "1.0.1";
+			const VERSION = "1.1.0";
 			const VERSION_OPTION_NAME = "woocommerce_seq_order_number_db_version";
 			
 			public function __construct() {
@@ -51,6 +51,9 @@ if (is_woocommerce_active()) {
 					
 					remove_filter( 'request', 'woocommerce_custom_shop_order_orderby' );
 					add_filter( 'request', array(&$this, 'woocommerce_custom_shop_order_orderby' ));
+					
+					remove_filter( 'parse_query', 'woocommerce_shop_order_search_custom_fields' );
+					add_filter( 'parse_query', array(&$this, 'woocommerce_shop_order_search_custom_fields' ));
 					
 					add_action( 'add_meta_boxes', array(&$this, 'woocommerce_meta_boxes'), 20 );
 				}
@@ -199,6 +202,73 @@ if (is_woocommerce_active()) {
 				endif;
 				
 				return $vars;
+			}
+			
+			
+			function woocommerce_shop_order_search_custom_fields( $wp ) {
+				global $pagenow, $wpdb;
+			   
+				if( 'edit.php' != $pagenow ) return $wp;
+				if( !isset( $wp->query_vars['s'] ) || !$wp->query_vars['s'] ) return $wp;
+				if ($wp->query_vars['post_type']!='shop_order') return $wp;
+				
+				$search_fields = array(
+					'_order_key',
+					'_billing_first_name',
+					'_billing_last_name',
+					'_billing_company', 
+					'_billing_address_1', 
+					'_billing_address_2',
+					'_billing_city',
+					'_billing_postcode', 
+					'_billing_country',
+					'_billing_state',
+					'_billing_email',
+					'_order_items',
+					'_billing_phone',
+					'_order_number'  // JES - added this
+				);
+				
+				// Query matching custom fields - this seems faster than meta_query
+				$post_ids = $wpdb->get_col($wpdb->prepare('SELECT post_id FROM '.$wpdb->postmeta.' WHERE meta_key IN ('.'"'.implode('","', $search_fields).'"'.') AND meta_value LIKE "%%%s%%"', esc_attr($_GET['s']) ));
+				
+				// Query matching excerpts and titles
+				$post_ids = array_merge($post_ids, $wpdb->get_col($wpdb->prepare('
+					SELECT '.$wpdb->posts.'.ID 
+					FROM '.$wpdb->posts.' 
+					LEFT JOIN '.$wpdb->postmeta.' ON '.$wpdb->posts.'.ID = '.$wpdb->postmeta.'.post_id
+					LEFT JOIN '.$wpdb->users.' ON '.$wpdb->postmeta.'.meta_value = '.$wpdb->users.'.ID
+					WHERE 
+						post_excerpt 	LIKE "%%%1$s%%" OR
+						post_title 		LIKE "%%%1$s%%" OR
+						(
+							meta_key		= "_customer_user" AND
+							(
+								user_login		LIKE "%%%1$s%%" OR
+								user_nicename	LIKE "%%%1$s%%" OR
+								user_email		LIKE "%%%1$s%%" OR
+								display_name	LIKE "%%%1$s%%"
+							)
+						)
+					', 
+					esc_attr($_GET['s']) 
+					)));
+				
+				// Add ID
+				$search_order_id = str_replace('Order #', '', $_GET['s']);
+				if (is_numeric($search_order_id)) $post_ids[] = $search_order_id;
+				
+				// Add blank ID so not all results are returned if the search finds nothing
+				$post_ids[] = 0;
+				
+				// Remove s - we don't want to search order name
+				unset( $wp->query_vars['s'] );
+				
+				// so we know we're doing this
+				$wp->query_vars['shop_order_search'] = true;
+				
+				// Search by found posts
+				$wp->query_vars['post__in'] = $post_ids;
 			}
 			
 			
