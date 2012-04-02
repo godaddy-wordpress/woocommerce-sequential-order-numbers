@@ -11,6 +11,8 @@ This plugin extends the WooCommerce e-commerce plugin by setting sequential orde
 
 This plugin extends the WooCommerce e-commerce plugin by setting sequential order numbers for new orders.  If there are existing orders at the time of installation, the sequential order numbers will start with the highest current order number.
 
+This plugin requires WooCommerce 1.5.3 or greater.
+
 = Feedback =
 * I am open to your suggestions and feedback - Thank you for using or trying out one of my plugins!
 * Drop me a line at [www.foxrunsoftware.com](http://www.foxrunsoftware.com)
