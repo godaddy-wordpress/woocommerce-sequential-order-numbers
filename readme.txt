@@ -20,7 +20,7 @@ This plugin extends the WooCommerce e-commerce plugin by setting sequential orde
 
 == Installation ==
 
-1. Upload the entire 'woocommerce-seq-order-number' folder to the '/wp-content/plugins/' directory
+1. Upload the entire 'woocommerce-sequential-order-number' folder to the '/wp-content/plugins/' directory
 2. Activate the plugin through the 'Plugins' menu in WordPress
 3. Order numbers will continue sequentially from the current highest order number, or from 1 if no orders have been placed yet
 
