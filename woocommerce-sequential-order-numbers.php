@@ -5,7 +5,7 @@ Plugin URI: http://www.foxrunsoftware.net/articles/wordpress/woocommerce-sequent
 Description: Provides sequential order numbers for WooCommerce orders
 Author: Justin Stern
 Author URI: http://www.foxrunsoftware.net
-Version: 1.1.0
+Version: 1.1.1
 
 	Copyright: © 2012 Justin Stern (email : justin@foxrunsoftware.net)
 	License: GNU General Public License v3.0
@@ -22,7 +22,7 @@ if (is_woocommerce_active()) {
 	if (!class_exists('WC_Seq_Order_Number')) {
 	 
 		class WC_Seq_Order_Number {
-			const VERSION = "1.1.0";
+			const VERSION = "1.1.1";
 			const VERSION_OPTION_NAME = "woocommerce_seq_order_number_db_version";
 			
 			public function __construct() {
@@ -31,6 +31,7 @@ if (is_woocommerce_active()) {
 				add_action('woocommerce_init',         array(&$this, 'woocommerce_loaded' ));
 				add_action('wp_insert_post',           array(&$this, 'set_sequential_order_number'), 10, 2);
 				add_filter('woocommerce_order_number', array(&$this, 'get_order_number'), 10, 2);
+				add_filter('woocommerce_email_subject_new_order', array(&$this, 'email_subject_new_order'), 10, 2);
 				
 				// Installation
 				if (is_admin() && !defined('DOING_AJAX')) $this->install();
@@ -553,6 +554,16 @@ if (is_woocommerce_active()) {
 					return '#'.$order->order_custom_fields['_order_number'][0];
 				}
 				return $order_number;
+			}
+			
+			
+			/**
+			 * Fix the admin new order email
+			 */
+			function email_subject_new_order($subject, $order) {
+				$blogname = wp_specialchars_decode(get_option('blogname'), ENT_QUOTES);
+				
+				return sprintf( __( '[%s] New Customer Order (%s)', 'woocommerce' ), $blogname, $order->get_order_number() );
 			}
 			
 			
