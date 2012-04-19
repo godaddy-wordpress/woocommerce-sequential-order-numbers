@@ -5,7 +5,7 @@ Plugin URI: http://www.foxrunsoftware.net/articles/wordpress/woocommerce-sequent
 Description: Provides sequential order numbers for WooCommerce orders
 Author: Justin Stern
 Author URI: http://www.foxrunsoftware.net
-Version: 1.1.1
+Version: 1.1.2
 
 	Copyright: © 2012 Justin Stern (email : justin@foxrunsoftware.net)
 	License: GNU General Public License v3.0
@@ -22,7 +22,7 @@ if (is_woocommerce_active()) {
 	if (!class_exists('WC_Seq_Order_Number')) {
 	 
 		class WC_Seq_Order_Number {
-			const VERSION = "1.1.1";
+			const VERSION = "1.1.2";
 			const VERSION_OPTION_NAME = "woocommerce_seq_order_number_db_version";
 			
 			public function __construct() {
@@ -73,7 +73,7 @@ if (is_woocommerce_active()) {
 				switch ($column) {
 					case "order_status" :
 						
-						echo sprintf( '<mark class="%s">%s</mark>', sanitize_title($order->status), __($order->status, 'woocommerce') );
+						printf( '<mark class="%s">%s</mark>', sanitize_title($order->status), __($order->status, 'woocommerce') );
 						
 					break;
 					case "order_title" :
@@ -206,6 +206,9 @@ if (is_woocommerce_active()) {
 			}
 			
 			
+			/**
+			 * Largely unchanged from original, just one point change noted below
+			 */
 			function woocommerce_shop_order_search_custom_fields( $wp ) {
 				global $pagenow, $wpdb;
 			   
@@ -489,7 +492,7 @@ if (is_woocommerce_active()) {
 									
 										if ($order->get_formatted_shipping_address()) echo '<p><strong>'.__('Address', 'woocommerce').':</strong><br/> ' .$order->get_formatted_shipping_address().'</p>'; else echo '<p class="none_set"><strong>'.__('Address', 'woocommerce').':</strong> ' . __('No shipping address set.', 'woocommerce') . '</p>';
 										
-										foreach ( $shipping_data as $key => $field ) : if (isset($field['show']) && !$field['show']) continue;
+										if ( $shipping_data ) foreach ( $shipping_data as $key => $field ) : if (isset($field['show']) && !$field['show']) continue;
 											$field_name = 'shipping_'.$key;
 											if ( $order->$field_name ) echo '<p><strong>'.$field['label'].':</strong> '.$order->$field_name.'</p>';
 										endforeach;
@@ -499,7 +502,7 @@ if (is_woocommerce_active()) {
 									// Display form
 									echo '<div class="edit_address"><p><button class="button load_customer_shipping">'.__('Load customer shipping address', 'woocommerce').'</button></p>';
 									
-									foreach ( $shipping_data as $key => $field ) :
+									if ( $shipping_data ) foreach ( $shipping_data as $key => $field ) :
 										if (!isset($field['type'])) $field['type'] = 'text';
 										switch ($field['type']) {
 											case "select" :
