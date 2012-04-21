@@ -3,7 +3,7 @@ Contributors: FoxRunSoftware
 Tags: woocommerce, order number
 Requires at least: 3.3
 Tested up to: 3.3
-Stable tag: 1.1.2
+Stable tag: 1.2.0
 
 This plugin extends the WooCommerce e-commerce plugin by setting sequential order numbers for new orders.
 
@@ -27,6 +27,9 @@ This plugin requires WooCommerce 1.5.3 or greater.
 3. Order numbers will continue sequentially from the current highest order number, or from 1 if no orders have been placed yet
 
 == Changelog ==
+
+= 1.2.0 =
+* Added support for the order tracking page
 
 = 1.1.2 =
 * Minor updates due to WooCommerce 1.5.4 release

@@ -5,7 +5,7 @@ Plugin URI: http://www.foxrunsoftware.net/articles/wordpress/woocommerce-sequent
 Description: Provides sequential order numbers for WooCommerce orders
 Author: Justin Stern
 Author URI: http://www.foxrunsoftware.net
-Version: 1.1.2
+Version: 1.2.0
 
 	Copyright: © 2012 Justin Stern (email : justin@foxrunsoftware.net)
 	License: GNU General Public License v3.0
@@ -22,7 +22,7 @@ if (is_woocommerce_active()) {
 	if (!class_exists('WC_Seq_Order_Number')) {
 	 
 		class WC_Seq_Order_Number {
-			const VERSION = "1.1.2";
+			const VERSION = "1.2.0";
 			const VERSION_OPTION_NAME = "woocommerce_seq_order_number_db_version";
 			
 			public function __construct() {
@@ -45,6 +45,10 @@ if (is_woocommerce_active()) {
 			function woocommerce_loaded() {
 				global $woocommerce;
 				
+				// remove the order tracking shortcode and use our own.
+				remove_shortcode( 'woocommerce_order_tracking', 'get_woocommerce_order_tracking' );
+				add_shortcode( 'woocommerce_order_tracking', array( &$this, 'get_woocommerce_order_tracking' ) );
+				
 				if (is_admin()) {
 					// Override a bunch of admin functionality to support the sequential order numbers on the backend, unfortunately...
 					remove_action('manage_shop_order_posts_custom_column', 'woocommerce_custom_order_columns', 2);
@@ -58,6 +62,65 @@ if (is_woocommerce_active()) {
 					
 					add_action( 'add_meta_boxes', array(&$this, 'woocommerce_meta_boxes'), 20 );
 				}
+			}
+			
+			
+			/**
+			 * Order Tracking page shortcode, which we hijack and replace with
+			 * our own order_number-friendly version
+			 */
+			public function get_woocommerce_order_tracking( $atts ) {
+				global $woocommerce;
+				return $woocommerce->shortcode_wrapper( array( &$this, 'woocommerce_order_tracking' ), $atts ); 
+			}
+			
+			
+			/**
+			 * Order Tracking page shortcode, largely unchanged from the original
+			 * this one just searches by order_number
+			 */
+			public function woocommerce_order_tracking( $atts ) {
+				global $woocommerce;
+				
+				$woocommerce->nocache();
+			
+				extract(shortcode_atts(array(
+				), $atts));
+				
+				global $post;
+				
+				if ($_POST) :
+					
+					$woocommerce->verify_nonce( 'order_tracking' );
+					
+					if (isset($_POST['orderid']) && $_POST['orderid'] > 0) $order_id = (int) $_POST['orderid']; else $order_id = 0;
+					if (isset($_POST['order_email']) && $_POST['order_email']) $order_email = trim($_POST['order_email']); else $order_email = '';
+					
+					// try and find the order by order_number
+					$order = $this->find_order_by_order_number( $order_id );
+					
+					if ($order->id && $order_email) :
+			
+						if (strtolower($order->billing_email) == strtolower($order_email)) :
+						
+							woocommerce_get_template( 'order/tracking.php', array(
+								'order' => $order
+							) );
+							
+							return;
+							
+						endif;
+								
+					endif;
+					
+					echo '<p>'.sprintf(__('Sorry, we could not find that order id in our database. <a href="%s">Want to retry?</a>', 'woocommerce'), get_permalink($post->ID)).'</p>';
+				
+				else :
+				
+					woocommerce_get_template( 'order/form-tracking.php' );
+					
+				endif;	
+				
 			}
 			
 			
@@ -570,6 +633,49 @@ if (is_woocommerce_active()) {
 			}
 			
 			
+			/** Helper methods ******************************************************/
+			
+			
+			/**
+			 * Search for an order with order_number $order_number
+			 * 
+			 * @param string $order_number order number to search for
+			 * 
+			 * @return WC_Order object with $order_number, or null if none is found
+			 */
+			private function find_order_by_order_number( $order_number ) {
+				$order = null;
+				
+				// search for the order by custom order number
+				$query_args = array(
+							'numberposts' => 1,
+							'meta_key'    => '_order_number',
+							'meta_value'  => $order_number,
+							'post_type'   => 'shop_order',
+							'post_status' => 'publish',
+							'fields'      => 'ids'
+						);
+				
+				list( $order_id ) = get_posts( $query_args );
+				
+				if ( $order_id !== null ) $order = new WC_Order( $order_id );
+				
+				// if we didn't find the order, then it may be from an order that pre-existed the installation of the sequential order number plugin
+				if ( ! $order ) {
+					$order = new WC_Order( $order_number );
+					if ( isset( $order->order_custom_fields['_order_number'][0] ) ) {
+						// _order_number was set, so this is not an old order, it's a new one that just happened to have post_id that matched the searched-for order_number
+						$order = null;
+					}
+				}
+				
+				return $order;
+			}
+			
+			
+			/** Lifecycle methods ******************************************************/
+			
+			
 			/**
 			 * Run every time.  Used since the activation hook is not executed when updating a plugin
 			 */
@@ -605,5 +711,5 @@ if (is_woocommerce_active()) {
 		}
 	}
 	
-	new WC_Seq_Order_Number();
+	$GLOBALS['wc_seq_order_number'] = new WC_Seq_Order_Number();
 }
