@@ -54,8 +54,7 @@ if (is_woocommerce_active()) {
 					remove_action('manage_shop_order_posts_custom_column', 'woocommerce_custom_order_columns', 2);
 					add_action('manage_shop_order_posts_custom_column', array(&$this,'woocommerce_custom_order_columns'), 2);
 					
-					remove_filter( 'request', 'woocommerce_custom_shop_order_orderby' );
-					add_filter( 'request', array(&$this, 'woocommerce_custom_shop_order_orderby' ));
+					add_filter( 'request', array(&$this, 'woocommerce_custom_shop_order_orderby' ), 20 );
 					
 					remove_filter( 'parse_query', 'woocommerce_shop_order_search_custom_fields' );
 					add_filter( 'parse_query', array(&$this, 'woocommerce_shop_order_search_custom_fields' ));
@@ -78,6 +77,9 @@ if (is_woocommerce_active()) {
 			/**
 			 * Order Tracking page shortcode, largely unchanged from the original
 			 * this one just searches by order_number
+			 * 
+			 * Code based on WooCommerce woocommerce_order_tracking()
+			 * @see woocommerce/shortcodes/shortcode-order_tracking.php
 			 */
 			public function woocommerce_order_tracking( $atts ) {
 				global $woocommerce;
@@ -127,6 +129,9 @@ if (is_woocommerce_active()) {
 			/**
 			 * Largely unchanged from the WooCommerce original, just one point
 			 * change identified below
+			 * 
+			 * Code based on WooCommerce 1.5.5 woocommerce_custom_order_columns()
+			 * @see woocommerce/admin/post-types/shop_order.php
 			 */
 			function woocommerce_custom_order_columns($column) {
 			
@@ -193,7 +198,7 @@ if (is_woocommerce_active()) {
 			        	endif;
 					break;
 					case "total_cost" :
-						echo woocommerce_price($order->order_total);
+						echo $order->get_formatted_order_total();
 					break;
 					case "order_date" :
 					
@@ -242,8 +247,7 @@ if (is_woocommerce_active()) {
 			
 			
 			/**
-			 * Largely unchanged from the WooCommerce original, just changed orderby
-			 * ID to operate on the meta _order_number
+			 * Orderby ID operates on the meta _order_number
 			 */
 			function woocommerce_custom_shop_order_orderby( $vars ) {
 				global $typenow, $wp_query;
@@ -251,12 +255,7 @@ if (is_woocommerce_active()) {
 			    
 			    // Sorting
 				if (isset( $vars['orderby'] )) :
-					if ( 'order_total' == $vars['orderby'] ) :
-						$vars = array_merge( $vars, array(
-							'meta_key' 	=> '_order_total',
-							'orderby' 	=> 'meta_value_num'
-						) );
-					elseif ( 'ID' == $vars['orderby'] ) :  // JES - added this
+					if ( 'ID' == $vars['orderby'] ) :  // JES - added this
 						$vars = array_merge( $vars, array(
 							'meta_key' 	=> '_order_number',
 							'orderby' 	=> 'meta_value_num'
@@ -271,6 +270,9 @@ if (is_woocommerce_active()) {
 			
 			/**
 			 * Largely unchanged from original, just one point change noted below
+			 * 
+			 * Code based on WooCommerce 1.5.5 woocommerce_shop_order_search_custom_fields()
+			 * @see woocommerce/admin/post-types/shop_order.php
 			 */
 			function woocommerce_shop_order_search_custom_fields( $wp ) {
 				global $pagenow, $wpdb;
@@ -351,6 +353,9 @@ if (is_woocommerce_active()) {
 			/**
 			 * Largely unchanged from the WooCommerce original, just one point
 			 * change identified below
+			 * 
+			 * Code based on WooCommerce 1.5.5 woocommerce_order_data_meta_box()
+			 * @see woocommerce/admin/post-types/writepanels/writepanel-order_data.php
 			 */
 			function woocommerce_order_data_meta_box($post) {
 				
