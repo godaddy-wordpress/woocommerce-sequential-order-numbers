@@ -18,8 +18,8 @@ Version: 1.2.0
 if ( ! function_exists( 'is_woocommerce_active' ) ) require_once( 'woo-includes/woo-functions.php' );
 
 		
-if (is_woocommerce_active()) {
-	if (!class_exists('WC_Seq_Order_Number')) {
+if ( is_woocommerce_active() ) {
+	if ( ! class_exists( 'WC_Seq_Order_Number' ) ) {
 	 
 		class WC_Seq_Order_Number {
 			const VERSION = "1.2.0";
@@ -28,13 +28,13 @@ if (is_woocommerce_active()) {
 			public function __construct() {
 				
 				// actions/filters
-				add_action('woocommerce_init',         array(&$this, 'woocommerce_loaded' ));
-				add_action('wp_insert_post',           array(&$this, 'set_sequential_order_number'), 10, 2);
-				add_filter('woocommerce_order_number', array(&$this, 'get_order_number'), 10, 2);
-				add_filter('woocommerce_email_subject_new_order', array(&$this, 'email_subject_new_order'), 10, 2);
+				add_action( 'woocommerce_init',                    array( &$this, 'woocommerce_loaded' ) );
+				add_action( 'wp_insert_post',                      array( &$this, 'set_sequential_order_number' ), 10, 2 );
+				add_filter( 'woocommerce_order_number',            array( &$this, 'get_order_number' ), 10, 2);
+				add_filter( 'woocommerce_email_subject_new_order', array( &$this, 'email_subject_new_order' ), 10, 2 );
 				
 				// Installation
-				if (is_admin() && !defined('DOING_AJAX')) $this->install();
+				if ( is_admin() && ! defined( 'DOING_AJAX' ) ) $this->install();
 			}
 			
 			
@@ -49,17 +49,17 @@ if (is_woocommerce_active()) {
 				remove_shortcode( 'woocommerce_order_tracking', 'get_woocommerce_order_tracking' );
 				add_shortcode( 'woocommerce_order_tracking', array( &$this, 'get_woocommerce_order_tracking' ) );
 				
-				if (is_admin()) {
+				if ( is_admin() ) {
 					// Override a bunch of admin functionality to support the sequential order numbers on the backend, unfortunately...
-					remove_action('manage_shop_order_posts_custom_column', 'woocommerce_custom_order_columns', 2);
-					add_action('manage_shop_order_posts_custom_column', array(&$this,'woocommerce_custom_order_columns'), 2);
+					remove_action( 'manage_shop_order_posts_custom_column', 'woocommerce_custom_order_columns', 2 );
+					add_action( 'manage_shop_order_posts_custom_column', array( &$this, 'woocommerce_custom_order_columns' ), 2 );
 					
-					add_filter( 'request', array(&$this, 'woocommerce_custom_shop_order_orderby' ), 20 );
+					add_filter( 'request', array( &$this, 'woocommerce_custom_shop_order_orderby' ), 20 );
 					
 					remove_filter( 'parse_query', 'woocommerce_shop_order_search_custom_fields' );
-					add_filter( 'parse_query', array(&$this, 'woocommerce_shop_order_search_custom_fields' ));
+					add_filter( 'parse_query', array( &$this, 'woocommerce_shop_order_search_custom_fields' ) );
 					
-					add_action( 'add_meta_boxes', array(&$this, 'woocommerce_meta_boxes'), 20 );
+					add_action( 'add_meta_boxes', array( &$this, 'woocommerce_meta_boxes' ), 20 );
 				}
 			}
 			
@@ -251,11 +251,11 @@ if (is_woocommerce_active()) {
 			 */
 			function woocommerce_custom_shop_order_orderby( $vars ) {
 				global $typenow, $wp_query;
-			    if ($typenow!='shop_order') return $vars;
+			    if ( $typenow != 'shop_order' ) return $vars;
 			    
 			    // Sorting
-				if (isset( $vars['orderby'] )) :
-					if ( 'ID' == $vars['orderby'] ) :  // JES - added this
+				if ( isset( $vars['orderby'] ) ) :
+					if ( 'ID' == $vars['orderby'] ) :
 						$vars = array_merge( $vars, array(
 							'meta_key' 	=> '_order_number',
 							'orderby' 	=> 'meta_value_num'
@@ -346,7 +346,7 @@ if (is_woocommerce_active()) {
 			 */
 			function woocommerce_meta_boxes() {
 				remove_meta_box( 'woocommerce-order-data', 'shop_order', 'normal' );
-				add_meta_box( 'woocommerce-order-data', __('Order Data', 'woocommerce'), array(&$this,'woocommerce_order_data_meta_box'), 'shop_order', 'normal', 'high' );
+				add_meta_box( 'woocommerce-order-data', __( 'Order Data', 'woocommerce' ), array( &$this,'woocommerce_order_data_meta_box' ), 'shop_order', 'normal', 'high' );
 			}
 			
 			
@@ -602,15 +602,15 @@ if (is_woocommerce_active()) {
 			function set_sequential_order_number( $post_id, $post ) {
 				global $wpdb;
 				
-				if ($post->post_type == 'shop_order' ) {
-					$order_number = get_post_meta($post_id, '_order_number', true);
-					if($order_number == "") {
+				if ( $post->post_type == 'shop_order' ) {
+					$order_number = get_post_meta( $post_id, '_order_number', true );
+					if ( $order_number == "" ) {
 						
 						// attempt the query up to 3 times for a much higher success rate if it fails (due to Deadlock)	
 						$success = false;
-						for($i = 0; $i < 3 && !$success; $i++) {
+						for ( $i = 0; $i < 3 && ! $success; $i++ ) {
 							// this seems to me like the safest way to avoid order number clashes
-							$success = $wpdb->query($wpdb->prepare('INSERT INTO '.$wpdb->postmeta.' (post_id,meta_key,meta_value) SELECT '.$post_id.',"_order_number",if(max(cast(meta_value as UNSIGNED)) is null,1,max(cast(meta_value as UNSIGNED))+1) from '.$wpdb->postmeta.' where meta_key="_order_number"'));
+							$success = $wpdb->query( $wpdb->prepare( 'INSERT INTO ' . $wpdb->postmeta . ' (post_id,meta_key,meta_value) SELECT ' . $post_id . ',"_order_number",if(max(cast(meta_value as UNSIGNED)) is null,1,max(cast(meta_value as UNSIGNED))+1) from ' . $wpdb->postmeta . ' where meta_key="_order_number"' ) );
 						}
 					}
 				}
@@ -620,9 +620,9 @@ if (is_woocommerce_active()) {
 			/**
 			 * Filter to return our _order_number field rather than the post ID
 			 */
-			function get_order_number($order_number, $order) {
-				if(isset($order->order_custom_fields['_order_number'])) {
-					return '#'.$order->order_custom_fields['_order_number'][0];
+			function get_order_number( $order_number, $order ) {
+				if ( isset( $order->order_custom_fields['_order_number'] ) ) {
+					return '#' . $order->order_custom_fields['_order_number'][0];
 				}
 				return $order_number;
 			}
@@ -631,8 +631,8 @@ if (is_woocommerce_active()) {
 			/**
 			 * Fix the admin new order email
 			 */
-			function email_subject_new_order($subject, $order) {
-				$blogname = wp_specialchars_decode(get_option('blogname'), ENT_QUOTES);
+			function email_subject_new_order( $subject, $order ) {
+				$blogname = wp_specialchars_decode( get_option( 'blogname' ), ENT_QUOTES );
 				
 				return sprintf( __( '[%s] New Customer Order (%s)', 'woocommerce' ), $blogname, $order->get_order_number() );
 			}
@@ -685,32 +685,32 @@ if (is_woocommerce_active()) {
 			 * Run every time.  Used since the activation hook is not executed when updating a plugin
 			 */
 			private function install() {
-				$installed_version = get_option(WC_Seq_Order_Number::VERSION_OPTION_NAME);
+				$installed_version = get_option( WC_Seq_Order_Number::VERSION_OPTION_NAME );
 				
-				if(!$installed_version) {
+				if ( ! $installed_version ) {
 					// initial install, set the order number for all existing orders to the post id
-					$orders = get_posts(array('numberposts' => '', 'post_type' => 'shop_order'));
-					if(is_array($orders)) {
-						foreach($orders as $order) {
-							if(get_post_meta($order->ID, '_order_number', true) == '') {
-								add_post_meta($order->ID, '_order_number', $order->ID);
+					$orders = get_posts( array( 'numberposts' => '', 'post_type' => 'shop_order' ) );
+					if ( is_array( $orders ) ) {
+						foreach( $orders as $order ) {
+							if ( get_post_meta( $order->ID, '_order_number', true ) == '' ) {
+								add_post_meta( $order->ID, '_order_number', $order->ID );
 							}
 						}
 					}
 				}
 				
-				if($installed_version != WC_Seq_Order_Number::VERSION) {
-					$this->upgrade($installed_version);
+				if ( $installed_version != WC_Seq_Order_Number::VERSION ) {
+					$this->upgrade( $installed_version );
 					
 					// new version number
-					update_option(WC_Seq_Order_Number::VERSION_OPTION_NAME, WC_Seq_Order_Number::VERSION);
+					update_option( WC_Seq_Order_Number::VERSION_OPTION_NAME, WC_Seq_Order_Number::VERSION );
 				}
 			}
 			
 			/**
 			 * Run when plugin version number changes
 			 */
-			private function upgrade($installed_version) {
+			private function upgrade( $installed_version ) {
 				// upgrade code goes here
 			}
 		}
