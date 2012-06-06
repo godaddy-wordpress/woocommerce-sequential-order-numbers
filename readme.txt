@@ -3,7 +3,7 @@ Contributors: FoxRunSoftware
 Tags: woocommerce, order number
 Requires at least: 3.3
 Tested up to: 3.3
-Stable tag: 1.2.2
+Stable tag: 1.2.3
 
 This plugin extends the WooCommerce e-commerce plugin by setting sequential order numbers for new orders.
 
@@ -40,6 +40,9 @@ This free version does not have that functionality, but now you can with the pai
 This free version does not have that functionality, but now you can with the paid [WooCommerce Sequential Order Numbers Pro](http://www.woothemes.com/extension/sequential-order-numbers-pro/)
 
 == Changelog ==
+
+= 1.2.3 =
+* Removed WooCommerce functions, which caused a compatibility issue with other WooCommerce plugins
 
 = 1.2.2 =
 * Takes advantage of new action hooks/filters available in WooCommerce 1.5.6

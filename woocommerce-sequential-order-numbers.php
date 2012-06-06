@@ -5,7 +5,7 @@ Plugin URI: http://www.foxrunsoftware.net/articles/wordpress/woocommerce-sequent
 Description: Provides sequential order numbers for WooCommerce orders
 Author: Justin Stern
 Author URI: http://www.foxrunsoftware.net
-Version: 1.2.2
+Version: 1.2.3
 
 	Copyright: © 2012 Justin Stern (email : justin@foxrunsoftware.net)
 	License: GNU General Public License v3.0
@@ -15,14 +15,12 @@ Version: 1.2.2
 /**
  * Required functions
  **/
-if ( ! function_exists( 'is_woocommerce_active' ) ) require_once( 'woo-includes/woo-functions.php' );
-
-		
-if ( is_woocommerce_active() ) {
+if ( in_array( 'woocommerce/woocommerce.php', apply_filters( 'active_plugins', get_option( 'active_plugins' ) ) ) ) {
+	
 	if ( ! class_exists( 'WC_Seq_Order_Number' ) ) {
 	 
 		class WC_Seq_Order_Number {
-			const VERSION = "1.2.2";
+			const VERSION = "1.2.3";
 			const VERSION_OPTION_NAME = "woocommerce_seq_order_number_db_version";
 			
 			public function __construct() {
