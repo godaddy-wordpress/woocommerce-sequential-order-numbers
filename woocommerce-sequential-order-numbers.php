@@ -5,7 +5,7 @@ Plugin URI: http://www.foxrunsoftware.net/articles/wordpress/woocommerce-sequent
 Description: Provides sequential order numbers for WooCommerce orders
 Author: Justin Stern
 Author URI: http://www.foxrunsoftware.net
-Version: 1.2.3
+Version: 1.2.4
 
 	Copyright: © 2012 Justin Stern (email : justin@foxrunsoftware.net)
 	License: GNU General Public License v3.0
@@ -20,13 +20,15 @@ if ( in_array( 'woocommerce/woocommerce.php', apply_filters( 'active_plugins', g
 	if ( ! class_exists( 'WC_Seq_Order_Number' ) ) {
 	 
 		class WC_Seq_Order_Number {
-			const VERSION = "1.2.3";
+			const VERSION = "1.2.4";
 			const VERSION_OPTION_NAME = "woocommerce_seq_order_number_db_version";
 			
 			public function __construct() {
 				
-				// set the custom order number on the new order
+				// set the custom order number on the new order.  we hook into wp_insert_post for orders which are created
+				//  from the frontend, and we hook into woocommerce_process_shop_order_meta for admin-created orders
 				add_action( 'wp_insert_post',                      array( &$this, 'set_sequential_order_number' ), 10, 2 );
+				add_action( 'woocommerce_process_shop_order_meta', array( &$this, 'set_sequential_order_number' ), 10, 2 );
 				
 				// return our custom order number for display
 				add_filter( 'woocommerce_order_number',            array( &$this, 'get_order_number' ), 10, 2);
@@ -88,7 +90,7 @@ if ( in_array( 'woocommerce/woocommerce.php', apply_filters( 'active_plugins', g
 			public function set_sequential_order_number( $post_id, $post ) {
 				global $wpdb;
 				
-				if ( $post->post_type == 'shop_order' ) {
+				if ( $post->post_type == 'shop_order' && $post->post_status != 'auto-draft' ) {
 					$order_number = get_post_meta( $post_id, '_order_number', true );
 					if ( $order_number == "" ) {
 						
@@ -96,7 +98,7 @@ if ( in_array( 'woocommerce/woocommerce.php', apply_filters( 'active_plugins', g
 						$success = false;
 						for ( $i = 0; $i < 3 && ! $success; $i++ ) {
 							// this seems to me like the safest way to avoid order number clashes
-							$success = $wpdb->query( $wpdb->prepare( 'INSERT INTO ' . $wpdb->postmeta . ' (post_id,meta_key,meta_value) SELECT ' . $post_id . ',"_order_number",if(max(cast(meta_value as UNSIGNED)) is null,1,max(cast(meta_value as UNSIGNED))+1) from ' . $wpdb->postmeta . ' where meta_key="_order_number"' ) );
+							$success = $wpdb->query( 'INSERT INTO ' . $wpdb->postmeta . ' (post_id,meta_key,meta_value) SELECT ' . $post_id . ',"_order_number",if(max(cast(meta_value as UNSIGNED)) is null,1,max(cast(meta_value as UNSIGNED))+1) from ' . $wpdb->postmeta . ' where meta_key="_order_number"' );
 						}
 					}
 				}
