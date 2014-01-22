@@ -5,7 +5,7 @@
  * Description: Provides sequential order numbers for WooCommerce orders
  * Author: SkyVerge
  * Author URI: http://www.skyverge.com
- * Version: 1.3
+ * Version: 1.3.1
  *
  * Copyright: (c) 2012-2013 SkyVerge, Inc. (info@skyverge.com)
  *
@@ -22,8 +22,9 @@
 if ( ! defined( 'ABSPATH' ) ) exit; // Exit if accessed directly
 
 // Check if WooCommerce is active
-if ( ! WC_Seq_Order_Number::is_woocommerce_active() )
+if ( ! WC_Seq_Order_Number::is_woocommerce_active() ) {
 	return;
+}
 
 /**
  * The WC_Seq_Order_Number global object
@@ -35,7 +36,7 @@ $GLOBALS['wc_seq_order_number'] = new WC_Seq_Order_Number();
 class WC_Seq_Order_Number {
 
 	/** version number */
-	const VERSION = "1.3";
+	const VERSION = "1.3.1";
 
 	/** version option name */
 	const VERSION_OPTION_NAME = "woocommerce_seq_order_number_db_version";
@@ -67,7 +68,9 @@ class WC_Seq_Order_Number {
 		}
 
 		// Installation
-		if ( is_admin() && ! defined( 'DOING_AJAX' ) ) $this->install();
+		if ( is_admin() && ! defined( 'DOING_AJAX' ) ) {
+			$this->install();
+		}
 	}
 
 
@@ -82,22 +85,24 @@ class WC_Seq_Order_Number {
 
 		// search for the order by custom order number
 		$query_args = array(
-					'numberposts' => 1,
-					'meta_key'    => '_order_number',
-					'meta_value'  => $order_number,
-					'post_type'   => 'shop_order',
-					'post_status' => 'publish',
-					'fields'      => 'ids',
-				);
+			'numberposts' => 1,
+			'meta_key'    => '_order_number',
+			'meta_value'  => $order_number,
+			'post_type'   => 'shop_order',
+			'post_status' => 'publish',
+			'fields'      => 'ids',
+		);
 
 		list( $order_id ) = get_posts( $query_args );
 
 		// order was found
-		if ( $order_id !== null ) return $order_id;
+		if ( $order_id !== null ) {
+			return $order_id;
+		}
 
 		// if we didn't find the order, then it may be that this plugin was disabled and an order was placed in the interim
 		$order = new WC_Order( $order_number );
-		if ( isset( $order->order_custom_fields['_order_number'][0] ) ) {
+		if ( $this->get_order_custom_field( $order, 'order_number' ) ) {
 			// _order_number was set, so this is not an old order, it's a new one that just happened to have post_id that matched the searched-for order_number
 			return 0;
 		}
@@ -147,8 +152,9 @@ class WC_Seq_Order_Number {
 	 * @return string custom order number, with leading hash
 	 */
 	public function get_order_number( $order_number, $order ) {
-		if ( isset( $order->order_custom_fields['_order_number'] ) ) {
-			return '#' . $order->order_custom_fields['_order_number'][0];
+
+		if ( $this->get_order_custom_field( $order, 'order_number' ) ) {
+			return '#' . $this->get_order_custom_field( $order, 'order_number' );
 		}
 
 		return $order_number;
@@ -167,7 +173,10 @@ class WC_Seq_Order_Number {
 	 */
 	public function woocommerce_custom_shop_order_orderby( $vars ) {
 		global $typenow, $wp_query;
-		if ( 'shop_order' == $typenow ) return $vars;
+		if ( 'shop_order' == $typenow ) {
+			return $vars;
+
+		}
 
 		return $this->custom_orderby( $vars );
 	}
@@ -260,10 +269,44 @@ class WC_Seq_Order_Number {
 
 		$active_plugins = (array) get_option( 'active_plugins', array() );
 
-		if ( is_multisite() )
+		if ( is_multisite() ) {
 			$active_plugins = array_merge( $active_plugins, get_site_option( 'active_sitewide_plugins', array() ) );
+		}
 
 		return in_array( 'woocommerce/woocommerce.php', $active_plugins ) || array_key_exists( 'woocommerce/woocommerce.php', $active_plugins );
+	}
+
+
+	/**
+	 * Returns an order custom field
+	 *
+	 * @since 1.3.1
+	 * @param WC_Order $order the order object
+	 * @param string $name the custom field name
+	 */
+	private function get_order_custom_field( $order, $name ) {
+
+		if ( version_compare( $this->get_wc_version(), '2.0.20', '>' ) ) {
+			return isset( $order->$name ) ? $order->$name : '';
+		} else {
+			return isset( $order->order_custom_fields[ '_' . $name ][0] ) ? $order->order_custom_fields[ '_' . $name ][0] : '';
+		}
+	}
+
+
+	/**
+	 * Compatibility function to get the version of the currently installed WooCommerce
+	 *
+	 * @since 1.3.1
+	 * @return string woocommerce version number or null
+	 */
+	private function get_wc_version() {
+
+		// WOOCOMMERCE_VERSION is now WC_VERSION, though WOOCOMMERCE_VERSION is still available for backwards compatibility, we'll disregard it on 2.1+
+		if ( defined( 'WC_VERSION' )          && WC_VERSION )          return WC_VERSION;
+		if ( defined( 'WOOCOMMERCE_VERSION' ) && WOOCOMMERCE_VERSION ) return WOOCOMMERCE_VERSION;
+
+		return null;
 	}
 
 
