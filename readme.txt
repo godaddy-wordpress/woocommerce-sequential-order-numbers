@@ -1,7 +1,8 @@
 === WooCommerce Sequential Order Numbers ===
 Contributors: SkyVerge
 Tags: woocommerce, order number
-Stable tag: 1.3.1
+Stable tag: 1.3.2
+Requires WooCommerce at least: 2.1
 
 This plugin extends the WooCommerce e-commerce plugin by setting sequential order numbers for new orders.
 
@@ -11,7 +12,7 @@ This plugin extends the WooCommerce e-commerce plugin by setting sequential orde
 
 If you like this plugin, but are looking for the ability to set the starting number, or to add a custom prefix/suffix to your order numbers (ie, you'd prefer something like WT101UK, WT102UK, etc) please consider our premium WooCommerce Sequential Order Numbers Pro plugin, available from the [WooThemes Store](http://www.woothemes.com/products/sequential-order-numbers-pro/)
 
-This plugin requires WooCommerce 1.5.6 or greater.
+This plugin requires WooCommerce 2.1 or greater.
 
 = Feedback =
 * We are open to your suggestions and feedback - Thank you for using or trying out one of our plugins!
@@ -38,6 +39,9 @@ This free version does not have that functionality, but now you can with the pre
 This free version does not have that functionality, but now you can with the premium [WooCommerce Sequential Order Numbers Pro](http://www.woothemes.com/products/sequential-order-numbers-pro/)
 
 == Changelog ==
+
+= 1.3.2 - 2014.09.02
+* Misc - WooCommerce 2.2 compatibility
 
 = 1.3.1 - 2014.01.22 =
 * Misc - WooCommerce 2.1 compatibility

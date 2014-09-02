@@ -5,7 +5,7 @@
  * Description: Provides sequential order numbers for WooCommerce orders
  * Author: SkyVerge
  * Author URI: http://www.skyverge.com
- * Version: 1.3.1
+ * Version: 1.3.2
  *
  * Copyright: (c) 2012-2013 SkyVerge, Inc. (info@skyverge.com)
  *
@@ -36,12 +36,39 @@ $GLOBALS['wc_seq_order_number'] = new WC_Seq_Order_Number();
 class WC_Seq_Order_Number {
 
 	/** version number */
-	const VERSION = "1.3.1";
+	const VERSION = "1.3.2";
 
 	/** version option name */
 	const VERSION_OPTION_NAME = "woocommerce_seq_order_number_db_version";
 
+	/** minimum required wc version */
+	const MINIMUM_WC_VERSION = '2.1';
+
+
+	/**
+	 * Construct the plugin
+	 *
+	 * @since 1.3.2
+	 */
 	public function __construct() {
+
+		add_action( 'plugins_loaded', array( $this, 'initialize' ) );
+
+	}
+
+
+	/**
+	 * Initialize the plugin, bailing if any required conditions are not met,
+	 * including minimum WooCommerce version
+	 *
+	 * @since 1.3.2
+	 */
+	public function initialize() {
+
+		if ( ! $this->minimum_wc_version_met() ) {
+			// halt functionality
+			return;
+		}
 
 		// set the custom order number on the new order.  we hook into wp_insert_post for orders which are created
 		//  from the frontend, and we hook into woocommerce_process_shop_order_meta for admin-created orders
@@ -93,6 +120,8 @@ class WC_Seq_Order_Number {
 			'fields'      => 'ids',
 		);
 
+		$query_args = self::backport_order_status_query_args( $query_args );
+
 		list( $order_id ) = get_posts( $query_args );
 
 		// order was found
@@ -101,8 +130,8 @@ class WC_Seq_Order_Number {
 		}
 
 		// if we didn't find the order, then it may be that this plugin was disabled and an order was placed in the interim
-		$order = new WC_Order( $order_number );
-		if ( $this->get_order_custom_field( $order, 'order_number' ) ) {
+		$order = self::wc_get_order( $order_number );
+		if ( $order->order_number ) {
 			// _order_number was set, so this is not an old order, it's a new one that just happened to have post_id that matched the searched-for order_number
 			return 0;
 		}
@@ -153,8 +182,8 @@ class WC_Seq_Order_Number {
 	 */
 	public function get_order_number( $order_number, $order ) {
 
-		if ( $this->get_order_custom_field( $order, 'order_number' ) ) {
-			return '#' . $this->get_order_custom_field( $order, 'order_number' );
+		if ( $order->order_number ) {
+			return '#' . $order->order_number;
 		}
 
 		return $order_number;
@@ -277,36 +306,148 @@ class WC_Seq_Order_Number {
 	}
 
 
-	/**
-	 * Returns an order custom field
-	 *
-	 * @since 1.3.1
-	 * @param WC_Order $order the order object
-	 * @param string $name the custom field name
-	 */
-	private function get_order_custom_field( $order, $name ) {
+	/** Compatibility Methods ******************************************************/
 
-		if ( version_compare( $this->get_wc_version(), '2.0.20', '>' ) ) {
-			return isset( $order->$name ) ? $order->$name : '';
+
+	/**
+	 * Get the WC Order instance for a given order ID or order post
+	 *
+	 * Introduced in WC 2.2 as part of the Order Factory so the 2.1 version is
+	 * not an exact replacement.
+	 *
+	 * If no param is passed, it will use the global post. Otherwise pass an
+	 * the order post ID or post object.
+	 *
+	 * @since 1.3.2
+	 * @param bool|int|string|\WP_Post $the_order
+	 * @return bool|\WC_Order
+	 */
+	public static function wc_get_order( $the_order = false ) {
+
+		if ( self::is_wc_version_gte_2_2() ) {
+
+			return wc_get_order( $the_order );
+
 		} else {
-			return isset( $order->order_custom_fields[ '_' . $name ][0] ) ? $order->order_custom_fields[ '_' . $name ][0] : '';
+
+			global $post;
+
+			if ( false === $the_order ) {
+
+				$order_id = $post->ID;
+
+			} elseif ( $the_order instanceof WP_Post ) {
+
+				$order_id = $the_order->ID;
+
+			} elseif ( is_numeric( $the_order ) ) {
+
+				$order_id = $the_order;
+			}
+
+			return new WC_Order( $order_id );
 		}
 	}
 
 
 	/**
-	 * Compatibility function to get the version of the currently installed WooCommerce
+	 * Transparently backport the `post_status` WP Query arg used by WC 2.2
+	 * for order statuses to the `shop_order_status` taxonomy query arg used by
+	 * WC 2.1
 	 *
-	 * @since 1.3.1
+	 * @since 1.3.2
+	 * @param array $args WP_Query args
+	 * @return array
+	 */
+	public static function backport_order_status_query_args( $args ) {
+
+		if ( ! self::is_wc_version_gte_2_2() ) {
+
+			// convert post status arg to taxonomy query compatible with WC 2.1
+			if ( ! empty( $args['post_status'] ) ) {
+
+				$order_statuses = array();
+
+				foreach ( (array) $args['post_status'] as $order_status ) {
+
+					$order_statuses[] = str_replace( 'wc-', '', $order_status );
+				}
+
+				$args['post_status'] = 'publish';
+
+				$tax_query = array(
+					array(
+						'taxonomy' => 'shop_order_status',
+						'field'    => 'slug',
+						'terms'    => $order_statuses,
+						'operator' => 'IN',
+					)
+				);
+
+				$args['tax_query'] = array_merge( ( isset( $args['tax_query'] ) ? $args['tax_query'] : array() ), $tax_query );
+			}
+		}
+
+		return $args;
+	}
+
+
+	/**
+	 * Helper method to get the version of the currently installed WooCommerce
+	 *
+	 * @since 1.3.2
 	 * @return string woocommerce version number or null
 	 */
-	private function get_wc_version() {
+	private static function get_wc_version() {
 
-		// WOOCOMMERCE_VERSION is now WC_VERSION, though WOOCOMMERCE_VERSION is still available for backwards compatibility, we'll disregard it on 2.1+
-		if ( defined( 'WC_VERSION' )          && WC_VERSION )          return WC_VERSION;
-		if ( defined( 'WOOCOMMERCE_VERSION' ) && WOOCOMMERCE_VERSION ) return WOOCOMMERCE_VERSION;
+		return defined( 'WC_VERSION' ) && WC_VERSION ? WC_VERSION : null;
+	}
 
-		return null;
+
+	/**
+	 * Returns true if the installed version of WooCommerce is 2.2 or greater
+	 *
+	 * @since 1.3.2
+	 * @return boolean true if the installed version of WooCommerce is 2.2 or greater
+	 */
+	public static function is_wc_version_gte_2_2() {
+		return self::get_wc_version() && version_compare( self::get_wc_version(), '2.2', '>=' );
+	}
+
+
+	/**
+	 * Perform a minimum WooCommerce version check
+	 *
+	 * @since 1.3.2
+	 * @return boolean true if the required version is met, false otherwise
+	 */
+	private function minimum_wc_version_met() {
+
+		// if a plugin defines a minimum WC version, render a notice and skip loading the plugin
+		if ( defined( 'self::MINIMUM_WC_VERSION' ) && version_compare( self::get_wc_version(), self::MINIMUM_WC_VERSION, '<' ) ) {
+			if ( is_admin() && ! defined( 'DOING_AJAX' ) && ! has_action( 'admin_notices', array( $this, 'render_update_notices' ) ) ) {
+				add_action( 'admin_notices', array( $this, 'render_update_notices' ) );
+			}
+			return false;
+		}
+
+		return true;
+	}
+
+
+	/**
+	 * Render a notice to update WooCommerce if needed
+	 *
+	 * @since 1.3.2
+	 */
+	public function render_update_notices() {
+
+		echo '<div class="error"><p>The following plugin is inactive because it requires a newer version of WooCommerce:</p><ul>';
+
+		printf( '<li>%s requires WooCommerce %s or newer</li>', 'Sequential Order Numbers', self::MINIMUM_WC_VERSION );
+
+		echo '</ul><p>Please <a href="' . admin_url( 'update-core.php' ) . '">update WooCommerce&nbsp;&raquo;</a></p></div>';
+
 	}
 
 
