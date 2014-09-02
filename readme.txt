@@ -40,7 +40,7 @@ This free version does not have that functionality, but now you can with the pre
 
 == Changelog ==
 
-= 1.3.2 - 2014.09.02
+= 1.3.2 - 2014.09.02 =
 * Misc - WooCommerce 2.2 compatibility
 
 = 1.3.1 - 2014.01.22 =
