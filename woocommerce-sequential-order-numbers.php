@@ -53,7 +53,7 @@ class WC_Seq_Order_Number {
 	public function __construct() {
 
 		add_action( 'plugins_loaded', array( $this, 'initialize' ) );
-
+		add_action( 'init',           array( $this, 'load_translation' ) );
 	}
 
 
@@ -98,6 +98,18 @@ class WC_Seq_Order_Number {
 		if ( is_admin() && ! defined( 'DOING_AJAX' ) ) {
 			$this->install();
 		}
+	}
+
+
+	/**
+	 * Load Translations
+	 *
+	 * @since 1.3.3
+	 */
+	public function load_translation() {
+
+		// localization
+		load_plugin_textdomain( 'woocommerce-sequential-order-numbers', false, dirname( plugin_basename( __FILE__ ) ) . '/i18n/languages' );
 	}
 
 
