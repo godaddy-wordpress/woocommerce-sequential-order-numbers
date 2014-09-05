@@ -43,7 +43,7 @@ This free version does not have that functionality, but now you can with the pre
 
 == Changelog ==
 
-= 1.3.2 - 2014.09.05 =
+= 1.3.3 - 2014.09.05 =
 * Localization - Included a .pot file for localization
 
 = 1.3.2 - 2014.09.02 =
