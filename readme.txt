@@ -5,7 +5,7 @@ Requires at least: 3.8
 Tested up to: 4.0
 Requires WooCommerce at least: 2.0
 Tested WooCommerce up to: 2.2
-Stable tag: 1.3.3-1
+Stable tag: 1.3.4
 
 This plugin extends WooCommerce by setting sequential order numbers for new orders.
 
