@@ -128,11 +128,9 @@ class WC_Seq_Order_Number {
 			'meta_key'    => '_order_number',
 			'meta_value'  => $order_number,
 			'post_type'   => 'shop_order',
-			'post_status' => self::wc_get_order_statuses(),
+			'post_status' => self::is_wc_version_gte_2_2() ? 'any' : 'publish',
 			'fields'      => 'ids',
 		);
-
-		$query_args = self::backport_order_status_query_args( $query_args );
 
 		list( $order_id ) = ! empty( $posts = get_posts( $query_args ) ) ? $posts : null;
 
@@ -510,7 +508,7 @@ class WC_Seq_Order_Number {
 
 		if ( ! $installed_version ) {
 			// initial install, set the order number for all existing orders to the post id
-			$orders = get_posts( array( 'numberposts' => '', 'post_type' => 'shop_order', 'nopaging' => true, 'post_status' => self::wc_get_order_statuses() ) );
+			$orders = get_posts( array( 'numberposts' => '', 'post_type' => 'shop_order', 'nopaging' => true, 'post_status' => self::is_wc_version_gte_2_2() ? 'any' : 'publish' ) );
 			if ( is_array( $orders ) ) {
 				foreach( $orders as $order ) {
 					if ( '' == get_post_meta( $order->ID, '_order_number', true ) ) {
