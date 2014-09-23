@@ -49,7 +49,7 @@ This free version does not have that functionality, but now you can with the pre
 
 == Changelog ==
 
-= 1.3.3 - 2014.nn.nn =
+= 1.3.4 - 2014.09.23 =
 * Fix - Compatibility fix with WooCommerce 2.1
 * Fix - Fix a deprecated notice in WooCommerce 2.2
 
