@@ -132,7 +132,8 @@ class WC_Seq_Order_Number {
 			'fields'      => 'ids',
 		);
 
-		list( $order_id ) = ! empty( $posts = get_posts( $query_args ) ) ? $posts : null;
+		$posts            = get_posts( $query_args );
+		list( $order_id ) = ! empty( $posts ) ? $posts : null;
 
 		// order was found
 		if ( $order_id !== null ) {
