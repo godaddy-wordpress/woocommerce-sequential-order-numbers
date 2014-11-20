@@ -2,7 +2,7 @@
 # This file is distributed under the GNU General Public License v3.0.
 msgid ""
 msgstr ""
-"Project-Id-Version: WooCommerce Sequential Order Numbers 1.3.4\n"
+"Project-Id-Version: WooCommerce Sequential Order Numbers 1.3.4-1\n"
 "Report-Msgid-Bugs-To: "
 "https://github.com/skyverge/woocommerce-sequential-order-numbers/issues\n"
 "POT-Creation-Date: 2014-09-05 22:27:38+00:00\n"

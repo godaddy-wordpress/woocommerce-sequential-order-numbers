@@ -5,7 +5,7 @@
  * Description: Provides sequential order numbers for WooCommerce orders
  * Author: SkyVerge
  * Author URI: http://www.skyverge.com
- * Version: 1.3.4
+ * Version: 1.3.4-1
  *
  * Copyright: (c) 2012-2013 SkyVerge, Inc. (info@skyverge.com)
  *
@@ -36,7 +36,7 @@ $GLOBALS['wc_seq_order_number'] = new WC_Seq_Order_Number();
 class WC_Seq_Order_Number {
 
 	/** version number */
-	const VERSION = "1.3.4";
+	const VERSION = "1.3.4-1";
 
 	/** version option name */
 	const VERSION_OPTION_NAME = "woocommerce_seq_order_number_db_version";
@@ -508,15 +508,41 @@ class WC_Seq_Order_Number {
 		$installed_version = get_option( WC_Seq_Order_Number::VERSION_OPTION_NAME );
 
 		if ( ! $installed_version ) {
-			// initial install, set the order number for all existing orders to the post id
-			$orders = get_posts( array( 'numberposts' => '', 'post_type' => 'shop_order', 'nopaging' => true, 'post_status' => self::is_wc_version_gte_2_2() ? 'any' : 'publish' ) );
-			if ( is_array( $orders ) ) {
-				foreach( $orders as $order ) {
-					if ( '' == get_post_meta( $order->ID, '_order_number', true ) ) {
-						add_post_meta( $order->ID, '_order_number', $order->ID );
+
+			// initial install, set the order number for all existing orders to the post id:
+			//  page through the "publish" orders in blocks to avoid out of memory errors
+			$offset         = (int) get_option( 'wc_sequential_order_numbers_install_offset', 0 );
+			$posts_per_page = 500;
+
+			do {
+
+				// initial install, set the order number for all existing orders to the post id
+				$order_ids = get_posts( array( 'post_type' => 'shop_order', 'fields' => 'ids', 'offset' => $offset, 'posts_per_page' => $posts_per_page, 'post_status' => self::is_wc_version_gte_2_2() ? 'any' : 'publish' ) );
+
+				// some sort of bad database error: deactivate the plugin and display an error
+				if ( is_wp_error( $order_ids ) ) {
+					require_once ABSPATH . 'wp-admin/includes/plugin.php';
+					deactivate_plugins( 'woocommerce-sequential-order-numbers/woocommerce-sequential-order-numbers.php' );  // hardcode the plugin path so that we can use symlinks in development
+
+					wp_die( sprintf( __( 'Error activating and installing <strong>WooCommerce Sequential Order Numbers</strong>: %s', 'woocommerce-sequential-order-numbers' ), '<ul><li>' . implode( '</li><li>', $order_ids->get_error_messages() ) . '</li></ul>' ) .
+					        '<a href="' . admin_url( 'plugins.php' ) . '">' . __( '&laquo; Go Back', 'woocommerce-sequential-order-numbers' ) . '</a>' );
+				}
+
+
+				if ( is_array( $order_ids ) ) {
+					foreach( $order_ids as $order_id ) {
+						if ( '' == get_post_meta( $order_id, '_order_number', true ) ) {
+							add_post_meta( $order_id, '_order_number', $order_id );
+						}
 					}
 				}
-			}
+
+				// increment offset
+				$offset += $posts_per_page;
+				// and keep track of how far we made it in case we hit a script timeout
+				update_option( 'wc_sequential_order_numbers_install_offset', $offset );
+
+			} while ( count( $order_ids ) == $posts_per_page );  // while full set of results returned  (meaning there may be more results still to retrieve)
 		}
 
 		if ( $installed_version != WC_Seq_Order_Number::VERSION ) {
