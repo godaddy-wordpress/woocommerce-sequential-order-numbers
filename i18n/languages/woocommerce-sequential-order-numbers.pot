@@ -13,6 +13,16 @@ msgstr ""
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 
+#: woocommerce-sequential-order-numbers.php:529
+msgid ""
+"Error activating and installing <strong>WooCommerce Sequential Order "
+"Numbers</strong>: %s"
+msgstr ""
+
+#: woocommerce-sequential-order-numbers.php:530
+msgid "&laquo; Go Back"
+msgstr ""
+
 #. Plugin Name of the plugin/theme
 msgid "WooCommerce Sequential Order Numbers"
 msgstr ""
