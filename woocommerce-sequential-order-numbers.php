@@ -6,6 +6,8 @@
  * Author: SkyVerge
  * Author URI: http://www.skyverge.com
  * Version: 1.3.4-1
+ * Text Domain: woocommerce-sequential-order-numbers
+ * Domain Path: /i18n/languages/
  *
  * Copyright: (c) 2012-2013 SkyVerge, Inc. (info@skyverge.com)
  *
