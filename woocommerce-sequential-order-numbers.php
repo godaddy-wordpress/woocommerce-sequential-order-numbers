@@ -76,6 +76,7 @@ class WC_Seq_Order_Number {
 		//  from the frontend, and we hook into woocommerce_process_shop_order_meta for admin-created orders
 		add_action( 'wp_insert_post',                      array( $this, 'set_sequential_order_number' ), 10, 2 );
 		add_action( 'woocommerce_process_shop_order_meta', array( $this, 'set_sequential_order_number' ), 10, 2 );
+		add_action( 'woocommerce_api_create_order',        array( $this, 'set_sequential_order_number' ), 10, 1 );
 
 		// return our custom order number for display
 		add_filter( 'woocommerce_order_number',            array( $this, 'get_order_number' ), 10, 2);
