@@ -51,7 +51,6 @@ This free version does not have that functionality, but now you can with the pre
 
 = 1.3.4-1 - 2014.nn.nn =
 * Fix - Improved install routine for shops with a large number of orders
-* Fix - Ensure sequential order numbers are set when an order is created via the REST API
 
 = 1.3.4 - 2014.09.23 =
 * Fix - Compatibility fix with WooCommerce 2.1
