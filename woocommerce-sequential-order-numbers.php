@@ -191,12 +191,12 @@ class WC_Seq_Order_Number {
 	 * @param string $order_number the order id with a leading hash
 	 * @param WC_Order $order the order object
 	 *
-	 * @return string custom order number, with leading hash
+	 * @return string custom order number, with leading hash for < WC 2.3
 	 */
 	public function get_order_number( $order_number, $order ) {
 
 		if ( $order->order_number ) {
-			return '#' . $order->order_number;
+			return ( self::is_wc_version_gte_2_3() ? '' : '#' ) . $order->order_number;
 		}
 
 		return $order_number;
@@ -461,6 +461,17 @@ class WC_Seq_Order_Number {
 	 */
 	public static function is_wc_version_gte_2_2() {
 		return self::get_wc_version() && version_compare( self::get_wc_version(), '2.2', '>=' );
+	}
+
+
+	/**
+	 * Returns true if the installed version of WooCommerce is 2.3 or greater
+	 *
+	 * @since 1.3.4-1
+	 * @return boolean true if the installed version of WooCommerce is 2.3 or greater
+	 */
+	public static function is_wc_version_gte_2_3() {
+		return self::get_wc_version() && version_compare( self::get_wc_version(), '2.3', '>=' );
 	}
 
 
