@@ -5,7 +5,7 @@
  * Description: Provides sequential order numbers for WooCommerce orders
  * Author: SkyVerge
  * Author URI: http://www.skyverge.com
- * Version: 1.3.4-1
+ * Version: 1.4.0
  * Text Domain: woocommerce-sequential-order-numbers
  * Domain Path: /i18n/languages/
  *
@@ -38,7 +38,7 @@ $GLOBALS['wc_seq_order_number'] = new WC_Seq_Order_Number();
 class WC_Seq_Order_Number {
 
 	/** version number */
-	const VERSION = "1.3.4-1";
+	const VERSION = "1.4.0";
 
 	/** version option name */
 	const VERSION_OPTION_NAME = "woocommerce_seq_order_number_db_version";
@@ -467,7 +467,7 @@ class WC_Seq_Order_Number {
 	/**
 	 * Returns true if the installed version of WooCommerce is 2.3 or greater
 	 *
-	 * @since 1.3.4-1
+	 * @since 1.4.0
 	 * @return boolean true if the installed version of WooCommerce is 2.3 or greater
 	 */
 	public static function is_wc_version_gte_2_3() {
