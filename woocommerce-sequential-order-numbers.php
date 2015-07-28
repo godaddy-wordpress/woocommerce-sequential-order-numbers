@@ -5,7 +5,7 @@
  * Description: Provides sequential order numbers for WooCommerce orders
  * Author: SkyVerge
  * Author URI: http://www.skyverge.com
- * Version: 1.4.0
+ * Version: 1.4.0-1
  * Text Domain: woocommerce-sequential-order-numbers
  * Domain Path: /i18n/languages/
  *
@@ -38,13 +38,13 @@ $GLOBALS['wc_seq_order_number'] = new WC_Seq_Order_Number();
 class WC_Seq_Order_Number {
 
 	/** version number */
-	const VERSION = "1.4.0";
+	const VERSION = "1.4.0-1";
 
 	/** version option name */
 	const VERSION_OPTION_NAME = "woocommerce_seq_order_number_db_version";
 
 	/** minimum required wc version */
-	const MINIMUM_WC_VERSION = '2.1';
+	const MINIMUM_WC_VERSION = '2.2';
 
 
 	/**
@@ -130,7 +130,7 @@ class WC_Seq_Order_Number {
 			'meta_key'    => '_order_number',
 			'meta_value'  => $order_number,
 			'post_type'   => 'shop_order',
-			'post_status' => self::is_wc_version_gte_2_2() ? 'any' : 'publish',
+			'post_status' => 'any',
 			'fields'      => 'ids',
 		);
 
@@ -143,7 +143,7 @@ class WC_Seq_Order_Number {
 		}
 
 		// if we didn't find the order, then it may be that this plugin was disabled and an order was placed in the interim
-		$order = self::wc_get_order( $order_number );
+		$order = wc_get_order( $order_number );
 		if ( $order->order_number ) {
 			// _order_number was set, so this is not an old order, it's a new one that just happened to have post_id that matched the searched-for order_number
 			return 0;
@@ -323,125 +323,6 @@ class WC_Seq_Order_Number {
 
 
 	/**
-	 * Get the WC Order instance for a given order ID or order post
-	 *
-	 * Introduced in WC 2.2 as part of the Order Factory so the 2.1 version is
-	 * not an exact replacement.
-	 *
-	 * If no param is passed, it will use the global post. Otherwise pass an
-	 * the order post ID or post object.
-	 *
-	 * @since 1.3.2
-	 * @param bool|int|string|\WP_Post $the_order
-	 * @return bool|\WC_Order
-	 */
-	public static function wc_get_order( $the_order = false ) {
-
-		if ( self::is_wc_version_gte_2_2() ) {
-
-			return wc_get_order( $the_order );
-
-		} else {
-
-			global $post;
-
-			if ( false === $the_order ) {
-
-				$order_id = $post->ID;
-
-			} elseif ( $the_order instanceof WP_Post ) {
-
-				$order_id = $the_order->ID;
-
-			} elseif ( is_numeric( $the_order ) ) {
-
-				$order_id = $the_order;
-			}
-
-			return new WC_Order( $order_id );
-		}
-	}
-
-
-	/**
-	 * Transparently backport the `post_status` WP Query arg used by WC 2.2
-	 * for order statuses to the `shop_order_status` taxonomy query arg used by
-	 * WC 2.1
-	 *
-	 * @since 1.3.2
-	 * @param array $args WP_Query args
-	 * @return array
-	 */
-	public static function backport_order_status_query_args( $args ) {
-
-		if ( ! self::is_wc_version_gte_2_2() ) {
-
-			// convert post status arg to taxonomy query compatible with WC 2.1
-			if ( ! empty( $args['post_status'] ) ) {
-
-				$order_statuses = array();
-
-				foreach ( (array) $args['post_status'] as $order_status ) {
-
-					$order_statuses[] = str_replace( 'wc-', '', $order_status );
-				}
-
-				$args['post_status'] = 'publish';
-
-				$tax_query = array(
-					array(
-						'taxonomy' => 'shop_order_status',
-						'field'    => 'slug',
-						'terms'    => $order_statuses,
-						'operator' => 'IN',
-					)
-				);
-
-				$args['tax_query'] = array_merge( ( isset( $args['tax_query'] ) ? $args['tax_query'] : array() ), $tax_query );
-			}
-		}
-
-		return $args;
-	}
-
-
-	/**
-	 * Get all order statuses
-	 *
-	 * Introduced in WC 2.2
-	 *
-	 * @since 1.3.4
-	 * @return array
-	 */
-	public static function wc_get_order_statuses() {
-
-		if ( self::is_wc_version_gte_2_2() ) {
-
-			return wc_get_order_statuses();
-
-		} else {
-
-			// get available order statuses
-			$order_status_terms = get_terms( 'shop_order_status', array( 'hide_empty' => false ) );
-
-			if ( is_wp_error( $order_status_terms ) ) {
-
-				$order_status_terms = array();
-			}
-
-			$order_statuses = array();
-
-			foreach ( $order_status_terms as $term ) {
-
-				$order_statuses[ $term->slug ] = $term->name;
-			}
-
-			return $order_statuses;
-		}
-	}
-
-
-	/**
 	 * Helper method to get the version of the currently installed WooCommerce
 	 *
 	 * @since 1.3.2
@@ -450,17 +331,6 @@ class WC_Seq_Order_Number {
 	private static function get_wc_version() {
 
 		return defined( 'WC_VERSION' ) && WC_VERSION ? WC_VERSION : null;
-	}
-
-
-	/**
-	 * Returns true if the installed version of WooCommerce is 2.2 or greater
-	 *
-	 * @since 1.3.2
-	 * @return boolean true if the installed version of WooCommerce is 2.2 or greater
-	 */
-	public static function is_wc_version_gte_2_2() {
-		return self::get_wc_version() && version_compare( self::get_wc_version(), '2.2', '>=' );
 	}
 
 
@@ -530,7 +400,7 @@ class WC_Seq_Order_Number {
 			do {
 
 				// initial install, set the order number for all existing orders to the post id
-				$order_ids = get_posts( array( 'post_type' => 'shop_order', 'fields' => 'ids', 'offset' => $offset, 'posts_per_page' => $posts_per_page, 'post_status' => self::is_wc_version_gte_2_2() ? 'any' : 'publish' ) );
+				$order_ids = get_posts( array( 'post_type' => 'shop_order', 'fields' => 'ids', 'offset' => $offset, 'posts_per_page' => $posts_per_page, 'post_status' => 'any' ) );
 
 				// some sort of bad database error: deactivate the plugin and display an error
 				if ( is_wp_error( $order_ids ) ) {
