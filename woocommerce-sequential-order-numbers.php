@@ -144,6 +144,11 @@ class WC_Seq_Order_Number {
 
 		// if we didn't find the order, then it may be that this plugin was disabled and an order was placed in the interim
 		$order = wc_get_order( $order_number );
+
+		if ( ! $order ) {
+			return 0;
+		}
+
 		if ( $order->order_number ) {
 			// _order_number was set, so this is not an old order, it's a new one that just happened to have post_id that matched the searched-for order_number
 			return 0;
