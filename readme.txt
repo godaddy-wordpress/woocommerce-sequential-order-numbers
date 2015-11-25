@@ -54,6 +54,9 @@ This free version does not have that functionality, but it's included in the pre
 
 == Changelog ==
 
+= 1.5.1 - 2015.11.26 =
+* Fix - Compatibility fix with WooCommerce Subscriptions 2.0
+
 = 1.5.0 - 2015.07.28 =
 * Misc - WooCommerce 2.4 Compatibility
 
