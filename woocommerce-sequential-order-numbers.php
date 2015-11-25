@@ -277,10 +277,12 @@ class WC_Seq_Order_Number {
 	 * @param WC_Order $original_order the original order object
 	 * @param int $product_id the product post identifier
 	 * @param string $new_order_role the role the renewal order is taking, one of 'parent' or 'child'
+	 * @return WC_Order Renewal order instance
 	 */
 	public function subscriptions_set_sequential_order_number( $renewal_order, $original_order, $product_id, $new_order_role ) {
 		$order_post = get_post( $renewal_order->id );
 		$this->set_sequential_order_number( $order_post->ID, $order_post );
+		return $renewal_order;
 	}
 
 
