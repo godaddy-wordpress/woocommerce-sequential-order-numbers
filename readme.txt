@@ -1,5 +1,5 @@
 === WooCommerce Sequential Order Numbers ===
-Contributors: maxrice, tamarazuk, SkyVerge
+Contributors: SkyVerge, maxrice, tamarazuk, chasewiseman, nekojira
 Tags: woocommerce, order number
 Requires at least: 3.8
 Tested up to: 4.4
