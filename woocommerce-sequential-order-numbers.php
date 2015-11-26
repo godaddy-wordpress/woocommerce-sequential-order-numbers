@@ -5,7 +5,7 @@
  * Description: Provides sequential order numbers for WooCommerce orders
  * Author: SkyVerge
  * Author URI: http://www.skyverge.com
- * Version: 1.5.0
+ * Version: 1.5.1
  * Text Domain: woocommerce-sequential-order-numbers
  * Domain Path: /i18n/languages/
  *
@@ -38,7 +38,7 @@ $GLOBALS['wc_seq_order_number'] = new WC_Seq_Order_Number();
 class WC_Seq_Order_Number {
 
 	/** version number */
-	const VERSION = "1.5.0";
+	const VERSION = "1.5.1";
 
 	/** version option name */
 	const VERSION_OPTION_NAME = "woocommerce_seq_order_number_db_version";
@@ -85,7 +85,12 @@ class WC_Seq_Order_Number {
 
 		// WC Subscriptions support: prevent unnecessary order meta from polluting parent renewal orders, and set order number for subscription orders
 		add_filter( 'woocommerce_subscriptions_renewal_order_meta_query', array( $this, 'subscriptions_remove_renewal_order_meta' ), 10, 4 );
-		add_action( 'woocommerce_subscriptions_renewal_order_created',    array( $this, 'subscriptions_set_sequential_order_number' ), 10, 4 );
+
+		if ( self::is_wc_subscriptions_version_gte_2_0() ) {
+			add_filter( 'woocommerce_subscriptions_renewal_order_created', array( $this, 'subscriptions_set_sequential_order_number' ), 10, 4 );
+		} else {
+			add_action( 'woocommerce_subscriptions_renewal_order_created', array( $this, 'subscriptions_set_sequential_order_number' ), 10, 4 );
+		}
 
 		if ( is_admin() ) {
 			add_filter( 'request',                              array( $this, 'woocommerce_custom_shop_order_orderby' ), 20 );
@@ -119,7 +124,6 @@ class WC_Seq_Order_Number {
 	 * Search for an order with order_number $order_number
 	 *
 	 * @param string $order_number order number to search for
-	 *
 	 * @return int post_id for the order identified by $order_number, or 0
 	 */
 	public function find_order_by_order_number( $order_number ) {
@@ -195,7 +199,6 @@ class WC_Seq_Order_Number {
 	 *
 	 * @param string $order_number the order id with a leading hash
 	 * @param WC_Order $order the order object
-	 *
 	 * @return string custom order number, with leading hash for < WC 2.3
 	 */
 	public function get_order_number( $order_number, $order ) {
@@ -215,7 +218,6 @@ class WC_Seq_Order_Number {
 	 * Admin order table orderby ID operates on our meta _order_number
 	 *
 	 * @param array $vars associative array of orderby parameteres
-	 *
 	 * @return array associative array of orderby parameteres
 	 */
 	public function woocommerce_custom_shop_order_orderby( $vars ) {
@@ -233,7 +235,7 @@ class WC_Seq_Order_Number {
 	 * Mofifies the given $args argument to sort on our meta integral _order_number
 	 *
 	 * @since 1.3
-	 * @param array $vars associative array of orderby parameteres
+	 * @param array $args associative array of orderby parameteres
 	 * @return array associative array of orderby parameteres
 	 */
 	public function custom_orderby( $args ) {
@@ -254,7 +256,6 @@ class WC_Seq_Order_Number {
 	 * the admin search functionality is maintained
 	 *
 	 * @param array $search_fields array of post meta fields to search by
-	 *
 	 * @return array of post meta fields to search by
 	 */
 	public function custom_search_fields( $search_fields ) {
@@ -269,18 +270,47 @@ class WC_Seq_Order_Number {
 
 
 	/**
+	 * Helper method to get the version of WooCommerce Subscriptions
+	 *
+	 * @since 1.5.1
+	 * @return string|null WC_Subscriptions version number or null if not found
+	 */
+	protected static function get_wc_subscriptions_version() {
+
+		return class_exists( 'WC_Subscriptions' ) && ! empty( WC_Subscriptions::$version ) ? WC_Subscriptions::$version : null;
+	}
+
+
+	/**
+	 * Returns true if the installed version of WooCommerce Subscriptions is 2.0.0 or greater
+	 *
+	 * @since 1.5.1
+	 * @return boolean
+	 */
+	protected static function is_wc_subscriptions_version_gte_2_0() {
+
+		return self::get_wc_subscriptions_version() && version_compare( self::get_wc_subscriptions_version(), '2.0-beta-1', '>=' );
+	}
+
+
+	/**
 	 * Sets an order number on a subscriptions-created order
 	 *
 	 * @since 1.3
-	 *
 	 * @param WC_Order $renewal_order the new renewal order object
 	 * @param WC_Order $original_order the original order object
 	 * @param int $product_id the product post identifier
 	 * @param string $new_order_role the role the renewal order is taking, one of 'parent' or 'child'
+	 * @return void|WC_Order Renewal order instance for Subscriptions 2.0+
 	 */
 	public function subscriptions_set_sequential_order_number( $renewal_order, $original_order, $product_id, $new_order_role ) {
+
 		$order_post = get_post( $renewal_order->id );
 		$this->set_sequential_order_number( $order_post->ID, $order_post );
+
+		if ( self::is_wc_subscriptions_version_gte_2_0() ) {
+			return $renewal_order;
+		}
 	}
 
 
@@ -288,7 +318,6 @@ class WC_Seq_Order_Number {
 	 * Don't copy over order number meta when creating a parent or child renewal order
 	 *
 	 * @since 1.3
-	 *
 	 * @param array $order_meta_query query for pulling the metadata
 	 * @param int $original_order_id Post ID of the order being used to purchased the subscription being renewed
 	 * @param int $renewal_order_id Post ID of the order created for renewing the subscription
@@ -309,7 +338,7 @@ class WC_Seq_Order_Number {
 	/**
 	 * Checks if WooCommerce is active
 	 *
-	 * @since  1.3
+	 * @since 1.3
 	 * @return bool true if WooCommerce is active, false otherwise
 	 */
 	public static function is_woocommerce_active() {
