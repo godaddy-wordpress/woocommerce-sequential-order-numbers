@@ -55,7 +55,7 @@ This free version does not have that functionality, but it's included in the pre
 == Changelog ==
 
 = 1.5.2 - 2015.12.07 =
-* Fix - Really fix compatibility with WooCommerce Subscriptions 2.0
+* Misc - WooCommerce Subscriptions: Use new filter hook wcs_renewal_order_created instead of deprecated woocommerce_subscriptions_renewal_order_created
 
 = 1.5.1 - 2015.11.26 =
 * Fix - Compatibility fix with WooCommerce Subscriptions 2.0
