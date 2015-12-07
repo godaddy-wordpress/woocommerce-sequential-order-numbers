@@ -5,7 +5,7 @@
  * Description: Provides sequential order numbers for WooCommerce orders
  * Author: SkyVerge
  * Author URI: http://www.skyverge.com
- * Version: 1.5.1
+ * Version: 1.5.2
  * Text Domain: woocommerce-sequential-order-numbers
  * Domain Path: /i18n/languages/
  *
@@ -38,7 +38,7 @@ $GLOBALS['wc_seq_order_number'] = new WC_Seq_Order_Number();
 class WC_Seq_Order_Number {
 
 	/** version number */
-	const VERSION = "1.5.1";
+	const VERSION = "1.5.2";
 
 	/** version option name */
 	const VERSION_OPTION_NAME = "woocommerce_seq_order_number_db_version";
@@ -85,12 +85,7 @@ class WC_Seq_Order_Number {
 
 		// WC Subscriptions support: prevent unnecessary order meta from polluting parent renewal orders, and set order number for subscription orders
 		add_filter( 'woocommerce_subscriptions_renewal_order_meta_query', array( $this, 'subscriptions_remove_renewal_order_meta' ), 10, 4 );
-
-		if ( self::is_wc_subscriptions_version_gte_2_0() ) {
-			add_filter( 'woocommerce_subscriptions_renewal_order_created', array( $this, 'subscriptions_set_sequential_order_number' ), 10, 4 );
-		} else {
-			add_action( 'woocommerce_subscriptions_renewal_order_created', array( $this, 'subscriptions_set_sequential_order_number' ), 10, 4 );
-		}
+		add_action( 'woocommerce_subscriptions_renewal_order_created', array( $this, 'subscriptions_set_sequential_order_number' ), 10, 2 );
 
 		if ( is_admin() ) {
 			add_filter( 'request',                              array( $this, 'woocommerce_custom_shop_order_orderby' ), 20 );
@@ -298,16 +293,15 @@ class WC_Seq_Order_Number {
 	 *
 	 * @since 1.3
 	 * @param WC_Order $renewal_order the new renewal order object
-	 * @param WC_Order $original_order the original order object
-	 * @param int $product_id the product post identifier
-	 * @param string $new_order_role the role the renewal order is taking, one of 'parent' or 'child'
-	 * @return void|WC_Order Renewal order instance for Subscriptions 2.0+
+	 * @param WC_Order $original_order the original order object (Subs 2.0+: Subscription object)
+	 * @return void|WC_Order Renewal order instance for Subscriptions =< 2.0
 	 */
-	public function subscriptions_set_sequential_order_number( $renewal_order, $original_order, $product_id, $new_order_role ) {
+	public function subscriptions_set_sequential_order_number( $renewal_order, $original_order ) {
 
 		$order_post = get_post( $renewal_order->id );
 		$this->set_sequential_order_number( $order_post->ID, $order_post );
 
+		// after 2.0 this callback needed to return the renewal order
 		if ( self::is_wc_subscriptions_version_gte_2_0() ) {
 			return $renewal_order;
 		}
