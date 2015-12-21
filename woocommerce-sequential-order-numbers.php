@@ -9,7 +9,7 @@
  * Text Domain: woocommerce-sequential-order-numbers
  * Domain Path: /i18n/languages/
  *
- * Copyright: (c) 2012-2013 SkyVerge, Inc. (info@skyverge.com)
+ * Copyright: (c) 2012-2016 SkyVerge, Inc. (info@skyverge.com)
  *
  * License: GNU General Public License v3.0
  * License URI: http://www.gnu.org/licenses/gpl-3.0.html
@@ -17,7 +17,7 @@
  * @package   WC-Sequential-Order-Numbers
  * @author    SkyVerge
  * @category  Plugin
- * @copyright Copyright (c) 2012-2013, SkyVerge, Inc.
+ * @copyright Copyright (c) 2012-2016, SkyVerge, Inc.
  * @license   http://www.gnu.org/licenses/gpl-3.0.html GNU General Public License v3.0
  */
 
