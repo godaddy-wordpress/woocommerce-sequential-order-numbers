@@ -44,7 +44,7 @@ class WC_Seq_Order_Number {
 	const VERSION_OPTION_NAME = "woocommerce_seq_order_number_db_version";
 
 	/** minimum required wc version */
-	const MINIMUM_WC_VERSION = '2.2';
+	const MINIMUM_WC_VERSION = '2.3';
 
 
 	/**
@@ -77,9 +77,6 @@ class WC_Seq_Order_Number {
 		add_action( 'wp_insert_post',                      array( $this, 'set_sequential_order_number' ), 10, 2 );
 		add_action( 'woocommerce_process_shop_order_meta', array( $this, 'set_sequential_order_number' ), 10, 2 );
 
-		// return our custom order number for display
-		add_filter( 'woocommerce_order_number',            array( $this, 'get_order_number' ), 10, 2);
-
 		// order tracking page search by order number
 		add_filter( 'woocommerce_shortcode_order_tracking_order_id', array( $this, 'find_order_by_order_number' ) );
 
@@ -87,7 +84,7 @@ class WC_Seq_Order_Number {
 		add_filter( 'woocommerce_subscriptions_renewal_order_meta_query', array( $this, 'subscriptions_remove_renewal_order_meta' ), 10, 4 );
 
 		if ( self::is_wc_subscriptions_version_gte_2_0() ) {
-			add_filter( 'wcs_renewal_order_created', array( $this, 'subscriptions_set_sequential_order_number' ), 10, 2 );
+			add_filter( 'wcs_renewal_order_created',                       array( $this, 'subscriptions_set_sequential_order_number' ), 10, 2 );
 		} else {
 			add_action( 'woocommerce_subscriptions_renewal_order_created', array( $this, 'subscriptions_set_sequential_order_number' ), 10, 2 );
 		}
@@ -172,12 +169,15 @@ class WC_Seq_Order_Number {
 		global $wpdb;
 
 		if ( 'shop_order' == $post->post_type && 'auto-draft' != $post->post_status ) {
+
 			$order_number = get_post_meta( $post_id, '_order_number', true );
+
 			if ( "" == $order_number ) {
 
 				// attempt the query up to 3 times for a much higher success rate if it fails (due to Deadlock)
 				$success = false;
 				for ( $i = 0; $i < 3 && ! $success; $i++ ) {
+
 					// this seems to me like the safest way to avoid order number clashes
 					$query = $wpdb->prepare( "
 						INSERT INTO {$wpdb->postmeta} (post_id, meta_key, meta_value)
@@ -193,24 +193,6 @@ class WC_Seq_Order_Number {
 	}
 
 
-	/**
-	 * Filter to return our _order_number field rather than the post ID,
-	 * for display.
-	 *
-	 * @param string $order_number the order id with a leading hash
-	 * @param WC_Order $order the order object
-	 * @return string custom order number, with leading hash for < WC 2.3
-	 */
-	public function get_order_number( $order_number, $order ) {
-
-		if ( $order->order_number ) {
-			return ( self::is_wc_version_gte_2_3() ? '' : '#' ) . $order->order_number;
-		}
-
-		return $order_number;
-	}
-
-
 	/** Admin filters ******************************************************/
 
 
@@ -222,9 +204,9 @@ class WC_Seq_Order_Number {
 	 */
 	public function woocommerce_custom_shop_order_orderby( $vars ) {
 		global $typenow, $wp_query;
+
 		if ( 'shop_order' == $typenow ) {
 			return $vars;
-
 		}
 
 		return $this->custom_orderby( $vars );
@@ -239,8 +221,10 @@ class WC_Seq_Order_Number {
 	 * @return array associative array of orderby parameteres
 	 */
 	public function custom_orderby( $args ) {
+
 		// Sorting
 		if ( isset( $args['orderby'] ) && 'ID' == $args['orderby'] ) {
+
 			$args = array_merge( $args, array(
 				'meta_key' => '_order_number',  // sort on numerical portion for better results
 				'orderby'  => 'meta_value_num',
@@ -276,7 +260,6 @@ class WC_Seq_Order_Number {
 	 * @return string|null WC_Subscriptions version number or null if not found
 	 */
 	protected static function get_wc_subscriptions_version() {
-
 		return class_exists( 'WC_Subscriptions' ) && ! empty( WC_Subscriptions::$version ) ? WC_Subscriptions::$version : null;
 	}
 
@@ -288,7 +271,6 @@ class WC_Seq_Order_Number {
 	 * @return boolean
 	 */
 	protected static function is_wc_subscriptions_version_gte_2_0() {
-
 		return self::get_wc_subscriptions_version() && version_compare( self::get_wc_subscriptions_version(), '2.0-beta-1', '>=' );
 	}
 
@@ -362,19 +344,29 @@ class WC_Seq_Order_Number {
 	 * @return string woocommerce version number or null
 	 */
 	private static function get_wc_version() {
-
 		return defined( 'WC_VERSION' ) && WC_VERSION ? WC_VERSION : null;
 	}
 
 
 	/**
-	 * Returns true if the installed version of WooCommerce is 2.3 or greater
+	 * Returns true if the installed version of WooCommerce is 2.4 or greater
 	 *
-	 * @since 1.4.0
+	 * @since 1.5.2
 	 * @return boolean true if the installed version of WooCommerce is 2.3 or greater
 	 */
-	public static function is_wc_version_gte_2_3() {
-		return self::get_wc_version() && version_compare( self::get_wc_version(), '2.3', '>=' );
+	public static function is_wc_version_gte_2_4() {
+		return self::get_wc_version() && version_compare( self::get_wc_version(), '2.4', '>=' );
+	}
+
+
+	/**
+	 * Returns true if the installed version of WooCommerce is 2.5 or greater
+	 *
+	 * @since 1.5.2
+	 * @return boolean true if the installed version of WooCommerce is 2.3 or greater
+	 */
+	public static function is_wc_version_gte_2_5() {
+		return self::get_wc_version() && version_compare( self::get_wc_version(), '2.5', '>=' );
 	}
 
 
@@ -388,9 +380,12 @@ class WC_Seq_Order_Number {
 
 		// if a plugin defines a minimum WC version, render a notice and skip loading the plugin
 		if ( defined( 'self::MINIMUM_WC_VERSION' ) && version_compare( self::get_wc_version(), self::MINIMUM_WC_VERSION, '<' ) ) {
+
 			if ( is_admin() && ! defined( 'DOING_AJAX' ) && ! has_action( 'admin_notices', array( $this, 'render_update_notices' ) ) ) {
+
 				add_action( 'admin_notices', array( $this, 'render_update_notices' ) );
 			}
+
 			return false;
 		}
 
@@ -407,7 +402,7 @@ class WC_Seq_Order_Number {
 
 		echo '<div class="error"><p>The following plugin is inactive because it requires a newer version of WooCommerce:</p><ul>';
 
-		printf( '<li>%s requires WooCommerce %s or newer</li>', 'Sequential Order Numbers', self::MINIMUM_WC_VERSION );
+		printf( '<li>%1$s requires WooCommerce %2$s or newer</li>', 'Sequential Order Numbers', self::MINIMUM_WC_VERSION );
 
 		echo '</ul><p>Please <a href="' . admin_url( 'update-core.php' ) . '">update WooCommerce&nbsp;&raquo;</a></p></div>';
 
@@ -440,13 +435,16 @@ class WC_Seq_Order_Number {
 					require_once ABSPATH . 'wp-admin/includes/plugin.php';
 					deactivate_plugins( 'woocommerce-sequential-order-numbers/woocommerce-sequential-order-numbers.php' );  // hardcode the plugin path so that we can use symlinks in development
 
+					// Translators: %s - error message(s)
 					wp_die( sprintf( __( 'Error activating and installing <strong>WooCommerce Sequential Order Numbers</strong>: %s', 'woocommerce-sequential-order-numbers' ), '<ul><li>' . implode( '</li><li>', $order_ids->get_error_messages() ) . '</li></ul>' ) .
 					        '<a href="' . admin_url( 'plugins.php' ) . '">' . __( '&laquo; Go Back', 'woocommerce-sequential-order-numbers' ) . '</a>' );
 				}
 
 
 				if ( is_array( $order_ids ) ) {
+
 					foreach( $order_ids as $order_id ) {
+
 						if ( '' == get_post_meta( $order_id, '_order_number', true ) ) {
 							add_post_meta( $order_id, '_order_number', $order_id );
 						}
@@ -476,4 +474,6 @@ class WC_Seq_Order_Number {
 	private function upgrade( $installed_version ) {
 		// upgrade code goes here
 	}
+
+
 }
