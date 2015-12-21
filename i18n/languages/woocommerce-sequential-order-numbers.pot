@@ -2,7 +2,7 @@
 # This file is distributed under the GNU General Public License v3.0.
 msgid ""
 msgstr ""
-"Project-Id-Version: WooCommerce Sequential Order Numbers 1.5.1\n"
+"Project-Id-Version: WooCommerce Sequential Order Numbers 1.5.2\n"
 "Report-Msgid-Bugs-To: "
 "https://github.com/skyverge/woocommerce-sequential-order-numbers/issues\n"
 "POT-Creation-Date: 2014-09-05 22:27:38+00:00\n"
@@ -13,13 +13,14 @@ msgstr ""
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 
-#: woocommerce-sequential-order-numbers.php:444
+#: woocommerce-sequential-order-numbers.php:439
+#. Translators: %s - error message(s)
 msgid ""
 "Error activating and installing <strong>WooCommerce Sequential Order "
 "Numbers</strong>: %s"
 msgstr ""
 
-#: woocommerce-sequential-order-numbers.php:445
+#: woocommerce-sequential-order-numbers.php:440
 msgid "&laquo; Go Back"
 msgstr ""
 
