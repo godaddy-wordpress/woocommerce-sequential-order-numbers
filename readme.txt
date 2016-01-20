@@ -2,10 +2,10 @@
 Contributors: SkyVerge, maxrice, tamarazuk, chasewiseman, nekojira
 Tags: woocommerce, order number
 Requires at least: 4.0
-Tested up to: 4.4
+Tested up to: 4.4.1
 Requires WooCommerce at least: 2.3
 Tested WooCommerce up to: 2.5
-Stable tag: 1.5.2
+Stable tag: 1.6.0
 
 This plugin extends WooCommerce by setting sequential order numbers for new orders.
 
@@ -54,7 +54,7 @@ This free version does not have that functionality, but it's included in the pre
 
 == Changelog ==
 
-= 1.5.2 - 2015.nn.nn =
+= 1.6.0 - 2015.nn.nn =
 * Misc - WooCommerce Subscriptions: Use new filter hook wcs_renewal_order_created instead of deprecated woocommerce_subscriptions_renewal_order_created
 * Misc - WooCommerce 2.5 compatibility
 * Misc - Dropped WooCommerce 2.2 support

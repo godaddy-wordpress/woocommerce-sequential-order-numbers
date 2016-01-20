@@ -5,7 +5,7 @@
  * Description: Provides sequential order numbers for WooCommerce orders
  * Author: SkyVerge
  * Author URI: http://www.skyverge.com
- * Version: 1.5.2
+ * Version: 1.6.0
  * Text Domain: woocommerce-sequential-order-numbers
  * Domain Path: /i18n/languages/
  *
@@ -38,7 +38,7 @@ $GLOBALS['wc_seq_order_number'] = new WC_Seq_Order_Number();
 class WC_Seq_Order_Number {
 
 	/** version number */
-	const VERSION = "1.5.2";
+	const VERSION = "1.6.0";
 
 	/** version option name */
 	const VERSION_OPTION_NAME = "woocommerce_seq_order_number_db_version";
@@ -76,6 +76,9 @@ class WC_Seq_Order_Number {
 		//  from the frontend, and we hook into woocommerce_process_shop_order_meta for admin-created orders
 		add_action( 'wp_insert_post',                      array( $this, 'set_sequential_order_number' ), 10, 2 );
 		add_action( 'woocommerce_process_shop_order_meta', array( $this, 'set_sequential_order_number' ), 10, 2 );
+
+		// return our custom order number for display
+		add_filter( 'woocommerce_order_number',            array( $this, 'get_order_number' ), 10, 2 );
 
 		// order tracking page search by order number
 		add_filter( 'woocommerce_shortcode_order_tracking_order_id', array( $this, 'find_order_by_order_number' ) );
@@ -190,6 +193,24 @@ class WC_Seq_Order_Number {
 				}
 			}
 		}
+	}
+
+
+	/**
+	 * Filter to return our _order_number field rather than the post ID,
+	 * for display.
+	 *
+	 * @param string $order_number the order id with a leading hash
+	 * @param WC_Order $order the order object
+	 * @return string custom order number, with leading hash for < WC 2.3
+	 */
+	public function get_order_number( $order_number, $order ) {
+
+		if ( $order->order_number ) {
+			return $order->order_number;
+		}
+
+		return $order_number;
 	}
 
 
@@ -351,7 +372,7 @@ class WC_Seq_Order_Number {
 	/**
 	 * Returns true if the installed version of WooCommerce is 2.4 or greater
 	 *
-	 * @since 1.5.2
+	 * @since 1.6.0
 	 * @return boolean true if the installed version of WooCommerce is 2.3 or greater
 	 */
 	public static function is_wc_version_gte_2_4() {
@@ -362,7 +383,7 @@ class WC_Seq_Order_Number {
 	/**
 	 * Returns true if the installed version of WooCommerce is 2.5 or greater
 	 *
-	 * @since 1.5.2
+	 * @since 1.6.0
 	 * @return boolean true if the installed version of WooCommerce is 2.3 or greater
 	 */
 	public static function is_wc_version_gte_2_5() {
