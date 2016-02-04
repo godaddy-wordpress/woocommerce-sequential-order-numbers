@@ -5,7 +5,7 @@
  * Description: Provides sequential order numbers for WooCommerce orders
  * Author: SkyVerge
  * Author URI: http://www.skyverge.com
- * Version: 1.6.0
+ * Version: 1.6.1
  * Text Domain: woocommerce-sequential-order-numbers
  * Domain Path: /i18n/languages/
  *
@@ -37,11 +37,12 @@ $GLOBALS['wc_seq_order_number'] = new WC_Seq_Order_Number();
 
 class WC_Seq_Order_Number {
 
+
 	/** version number */
-	const VERSION = "1.6.0";
+	const VERSION = '1.6.1';
 
 	/** version option name */
-	const VERSION_OPTION_NAME = "woocommerce_seq_order_number_db_version";
+	const VERSION_OPTION_NAME = 'woocommerce_seq_order_number_db_version';
 
 	/** minimum required wc version */
 	const MINIMUM_WC_VERSION = '2.3';
@@ -72,24 +73,24 @@ class WC_Seq_Order_Number {
 			return;
 		}
 
-		// set the custom order number on the new order.  we hook into wp_insert_post for orders which are created
-		//  from the frontend, and we hook into woocommerce_process_shop_order_meta for admin-created orders
-		add_action( 'wp_insert_post',                      array( $this, 'set_sequential_order_number' ), 10, 2 );
+		// Set the custom order number on the new order.  we hook into wp_insert_post for orders which are created
+		// from the frontend, and we hook into woocommerce_process_shop_order_meta for admin-created orders
+		add_action( 'wp_insert_post', array( $this, 'set_sequential_order_number' ), 10, 2 );
 		add_action( 'woocommerce_process_shop_order_meta', array( $this, 'set_sequential_order_number' ), 10, 2 );
 
 		// return our custom order number for display
-		add_filter( 'woocommerce_order_number',            array( $this, 'get_order_number' ), 10, 2 );
+		add_filter( 'woocommerce_order_number', array( $this, 'get_order_number' ), 10, 2 );
 
 		// order tracking page search by order number
 		add_filter( 'woocommerce_shortcode_order_tracking_order_id', array( $this, 'find_order_by_order_number' ) );
 
-		// WC Subscriptions support: prevent unnecessary order meta from polluting parent renewal orders, and set order number for subscription orders
-		add_filter( 'woocommerce_subscriptions_renewal_order_meta_query', array( $this, 'subscriptions_remove_renewal_order_meta' ), 10, 4 );
-
+		// WC Subscriptions support
 		if ( self::is_wc_subscriptions_version_gte_2_0() ) {
-			add_filter( 'wcs_renewal_order_created',                       array( $this, 'subscriptions_set_sequential_order_number' ), 10, 2 );
+			add_filter( 'wcs_renewal_order_meta_query',                       array( $this, 'subscriptions_remove_renewal_order_meta' ) );
+			add_filter( 'wcs_renewal_order_created',                          array( $this, 'subscriptions_set_sequential_order_number' ), 10, 2 );
 		} else {
-			add_action( 'woocommerce_subscriptions_renewal_order_created', array( $this, 'subscriptions_set_sequential_order_number' ), 10, 2 );
+			add_filter( 'woocommerce_subscriptions_renewal_order_meta_query', array( $this, 'subscriptions_remove_renewal_order_meta' ) );
+			add_action( 'woocommerce_subscriptions_renewal_order_created',    array( $this, 'subscriptions_set_sequential_order_number' ), 10, 2 );
 		}
 
 		if ( is_admin() ) {
@@ -102,7 +103,7 @@ class WC_Seq_Order_Number {
 		}
 
 		// Installation
-		if ( is_admin() && ! defined( 'DOING_AJAX' ) ) {
+		if ( is_admin() && ! is_ajax() ) {
 			$this->install();
 		}
 	}
@@ -166,16 +167,16 @@ class WC_Seq_Order_Number {
 	 * Set the _order_number field for the newly created order
 	 *
 	 * @param int $post_id post identifier
-	 * @param object $post post object
+	 * @param WP_Post $post post object
 	 */
 	public function set_sequential_order_number( $post_id, $post ) {
 		global $wpdb;
 
-		if ( 'shop_order' == $post->post_type && 'auto-draft' != $post->post_status ) {
+		if ( 'shop_order' === $post->post_type && 'auto-draft' !== $post->post_status ) {
 
 			$order_number = get_post_meta( $post_id, '_order_number', true );
 
-			if ( "" == $order_number ) {
+			if ( '' === $order_number ) {
 
 				// attempt the query up to 3 times for a much higher success rate if it fails (due to Deadlock)
 				$success = false;
@@ -226,7 +227,7 @@ class WC_Seq_Order_Number {
 	public function woocommerce_custom_shop_order_orderby( $vars ) {
 		global $typenow, $wp_query;
 
-		if ( 'shop_order' == $typenow ) {
+		if ( 'shop_order' === $typenow ) {
 			return $vars;
 		}
 
@@ -319,18 +320,15 @@ class WC_Seq_Order_Number {
 	/**
 	 * Don't copy over order number meta when creating a parent or child renewal order
 	 *
+	 * Prevents unnecessary order meta from polluting parent renewal orders,
+	 * and set order number for subscription orders
+	 *
 	 * @since 1.3
 	 * @param array $order_meta_query query for pulling the metadata
-	 * @param int $original_order_id Post ID of the order being used to purchased the subscription being renewed
-	 * @param int $renewal_order_id Post ID of the order created for renewing the subscription
-	 * @param string $new_order_role The role the renewal order is taking, one of 'parent' or 'child'
 	 * @return string
 	 */
-	public function subscriptions_remove_renewal_order_meta( $order_meta_query, $original_order_id, $renewal_order_id, $new_order_role ) {
-
-		$order_meta_query .= " AND meta_key NOT IN ( '_order_number' )";
-
-		return $order_meta_query;
+	public function subscriptions_remove_renewal_order_meta( $order_meta_query ) {
+		return $order_meta_query . " AND meta_key NOT IN ( '_order_number' )";
 	}
 
 
@@ -402,7 +400,7 @@ class WC_Seq_Order_Number {
 		// if a plugin defines a minimum WC version, render a notice and skip loading the plugin
 		if ( defined( 'self::MINIMUM_WC_VERSION' ) && version_compare( self::get_wc_version(), self::MINIMUM_WC_VERSION, '<' ) ) {
 
-			if ( is_admin() && ! defined( 'DOING_AJAX' ) && ! has_action( 'admin_notices', array( $this, 'render_update_notices' ) ) ) {
+			if ( is_admin() && ! is_ajax() && ! has_action( 'admin_notices', array( $this, 'render_update_notices' ) ) ) {
 
 				add_action( 'admin_notices', array( $this, 'render_update_notices' ) );
 			}
@@ -466,7 +464,7 @@ class WC_Seq_Order_Number {
 
 					foreach( $order_ids as $order_id ) {
 
-						if ( '' == get_post_meta( $order_id, '_order_number', true ) ) {
+						if ( '' === get_post_meta( $order_id, '_order_number', true ) ) {
 							add_post_meta( $order_id, '_order_number', $order_id );
 						}
 					}
@@ -477,10 +475,10 @@ class WC_Seq_Order_Number {
 				// and keep track of how far we made it in case we hit a script timeout
 				update_option( 'wc_sequential_order_numbers_install_offset', $offset );
 
-			} while ( count( $order_ids ) == $posts_per_page );  // while full set of results returned  (meaning there may be more results still to retrieve)
+			} while ( count( $order_ids ) === $posts_per_page );  // while full set of results returned  (meaning there may be more results still to retrieve)
 		}
 
-		if ( $installed_version != WC_Seq_Order_Number::VERSION ) {
+		if ( $installed_version !== WC_Seq_Order_Number::VERSION ) {
 			$this->upgrade( $installed_version );
 
 			// new version number
