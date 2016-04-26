@@ -56,6 +56,11 @@ Once you've installed the plugin, to get started please:
 
 The plugin doesn't require any :) When you activate it, it gets to work right away! Orders will automatically become sequential, starting from the most recent order number.
 
+= Why doesn't my payment gateway use this number? =
+
+For full compatibility with extensions which alter the order number, such as Sequential Order Numbers, WooCommerce extensions should use `$order->get_order_number();` rather than `$order->id` when referencing the order number. 
+
+If your extension is not displaying the correct order number, you can try contacting the developers of your payment gateway to see if it's possible to make this tiny change. Using the order number instead is both compatible with WooCommerce core and our plugin, as without the order number being changed, it will be equal to the order ID.
 
 = Can I start the order numbers at a particular number? =
 
