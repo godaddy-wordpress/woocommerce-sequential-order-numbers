@@ -2,9 +2,9 @@
 Contributors: SkyVerge, maxrice, tamarazuk, chasewiseman, nekojira
 Tags: woocommerce, order number
 Requires at least: 4.0
-Tested up to: 4.4.2
+Tested up to: 4.5
 Requires WooCommerce at least: 2.3
-Tested WooCommerce up to: 2.5
+Tested WooCommerce up to: 2.6
 Stable tag: 1.6.1
 
 This plugin extends WooCommerce by setting sequential order numbers for new orders.
@@ -17,10 +17,13 @@ This plugin extends WooCommerce by automatically setting sequential order number
 
 > No configuration needed! The plugin is so easy to use, there aren't even any settings. Activate it, and orders will automatically become sequential.
 
-If you have no orders in your store, your orders will begin counting from order number 1. If you hav existing orders, the count will pick up from your highest order number. If you've placed test orders, you must trash **and** permanently delete them to begin ordering at "1" (trashed orders have to be counted in case they're restored, so they need to be gone completely).
+If you have no orders in your store, your orders will begin counting from order number 1. If you have existing orders, the count will pick up from your highest order number. 
+
+If you've placed test orders, you must trash **and** permanently delete them to begin ordering at "1" (trashed orders have to be counted in case they're restored, so they need to be gone completely).
 
 = Support Details =
-We do support our free plugins and extensions, but please understand that support for premium products takes priority. We typically check the forums every few days (with a maximum delay of one week).
+
+We do support our free plugins and extensions, but please understand that support for premium products takes priority. We typically check the forums every few days (usually with a maximum delay of one week).
 
 = Sequential Order Numbers Pro =
 
@@ -36,25 +39,62 @@ Interested in contributing? You can [find the project on GitHub](https://github.
 
 == Installation ==
 
-1. Upload the entire 'woocommerce-sequential-order-numbers' folder to the '/wp-content/plugins/' directory, **or** upload the zip via Plugins &gt; Add New
-2. Activate the plugin through the "Plugins" menu in WordPress
-3. No configuration needed! Order numbers will continue sequentially from the current highest order number, or from 1 if no orders have been placed yet
+You can install the plugin in a few ways:
+
+1. Upload the entire 'woocommerce-sequential-order-numbers' folder to the '/wp-content/plugins/' directory
+2. Upload the zip file you download via Plugins &gt; Add New
+3. Go to Plugins &gt; Add New and search for "WooCommerce Sequential Order Numbers", and install the one from SkyVerge.
+
+Once you've installed the plugin, to get started please:
+
+1. Activate the plugin through the "Plugins" menu in WordPress.
+2. No configuration needed! Order numbers will continue sequentially from the current highest order number, or from 1 if no orders have been placed yet.
 
 == Frequently Asked Questions ==
 
 = Where are the settings? =
 
-The plugin doesn't require any :). When you activate it, it gets to work right away! Orders will automatically become sequential, starting from the most recent order number.
+The plugin doesn't require any :) When you activate it, it gets to work right away! Orders will automatically become sequential, starting from the most recent order number.
+
 
 = Can I start the order numbers at a particular number? =
 
 This free version does not have that functionality, but the premium [WooCommerce Sequential Order Numbers Pro](http://www.woothemes.com/products/sequential-order-numbers-pro/) will allow you to choose any starting number that's higher than your most current order number.
+
+= Can I start the order numbers at "1"? =
 
 If you want to begin numbering at "1", you must trash, then permanently delete all orders in your store so that there are no order numbers already being counted.
 
 = Can I set an order number prefix/suffix? =
 
 This free version does not have that functionality, but it's included in the premium [WooCommerce Sequential Order Numbers Pro](http://www.woothemes.com/products/sequential-order-numbers-pro/).
+
+== Other Notes ==
+
+If you'd like to make your payment gateway compatible with Sequential Order Numbers, or other plugins that filter the order number, please make one small change. Instead of referencing `$order->id` when storing order data, reference: `$order->get_order_number()`
+
+This is compatible with WooCommerce core by default, as the order number is typically equal to the order ID. However, this will also let you be compatible with plugins such as ours, as the order number can be filtered (which is what we do to make it sequential), so using order number is preferred.
+
+Some other notes to help developers:
+
+= Get an order from order number =
+
+If you want to access the order based on the sequential order number, you can do so with a helper method: 
+
+`
+$order_id = $GLOBALS['wc_seq_order_number']->find_order_by_order_number( $order_number );
+`
+
+This will give you the order's ID (post ID), and you can get the order object from this.
+
+= Get the order number =
+
+If you have access to the order ID or order object, you can easily get the sequential order number based on WooCommerce core functions.
+
+`
+$order = wc_get_order( $order_id );
+$order_number = $order->get_order_number();
+`
 
 == Changelog ==
 
