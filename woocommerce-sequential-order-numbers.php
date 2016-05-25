@@ -545,25 +545,9 @@ function wc_sequential_order_numbers() {
 
 
 /**
- * Returns the One True Instance of Sequential Order Numbers after warning that
- * the global has been deprecated
- *
- * @since 1.7.0
- * @return \WC_Seq_Order_Number
- */
-function wc_sequential_order_numbers_deprecated_global() {
-
-	/* @deprecated since 1.7.0 */
-	_deprecated_function( "\$GLOBALS['wc_seq_order_number']", '1.7.0', 'wc_sequential_order_numbers()' );
-
-	return wc_sequential_order_numbers();
-}
-
-
-/**
  * The WC_Seq_Order_Number global object
  * @deprecated 1.7.0
  * @name $wc_seq_order_number
  * @global WC_Seq_Order_Number $GLOBALS['wc_seq_order_number']
  */
-$GLOBALS['wc_seq_order_number'] = wc_sequential_order_numbers_deprecated_global();
+$GLOBALS['wc_seq_order_number'] = wc_sequential_order_numbers();

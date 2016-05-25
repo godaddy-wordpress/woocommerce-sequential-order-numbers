@@ -13,14 +13,24 @@ msgstr ""
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 
-#: woocommerce-sequential-order-numbers.php:458
+#: woocommerce-sequential-order-numbers.php:67
+#. translators: Placeholders: %s - plugin name
+msgid "You cannot clone instances of %s."
+msgstr ""
+
+#: woocommerce-sequential-order-numbers.php:79
+#. translators: Placeholders: %s - plugin name
+msgid "You cannot unserialize instances of %s."
+msgstr ""
+
+#: woocommerce-sequential-order-numbers.php:493
 #. Translators: %s - error message(s)
 msgid ""
 "Error activating and installing <strong>WooCommerce Sequential Order "
 "Numbers</strong>: %s"
 msgstr ""
 
-#: woocommerce-sequential-order-numbers.php:459
+#: woocommerce-sequential-order-numbers.php:494
 msgid "&laquo; Go Back"
 msgstr ""
 
