@@ -1,11 +1,11 @@
 === WooCommerce Sequential Order Numbers ===
 Contributors: SkyVerge, maxrice, tamarazuk, chasewiseman, nekojira
 Tags: woocommerce, order number
-Requires at least: 4.0
-Tested up to: 4.5
-Requires WooCommerce at least: 2.3
-Tested WooCommerce up to: 2.6
-Stable tag: 1.6.1
+Requires at least: 4.1
+Tested up to: 4.5.2
+Requires WooCommerce at least: 2.4.13
+Tested WooCommerce up to: 2.6.0
+Stable tag: 1.7.0
 
 This plugin extends WooCommerce by setting sequential order numbers for new orders.
 
@@ -13,11 +13,11 @@ This plugin extends WooCommerce by setting sequential order numbers for new orde
 
 This plugin extends WooCommerce by automatically setting sequential order numbers for new orders.  If there are existing orders at the time of installation, the sequential order numbers will start with the highest current order number.
 
-**This plugin requires WooCommerce 2.3 or newer.**
+**This plugin requires WooCommerce 2.4.13 or newer.**
 
 > No configuration needed! The plugin is so easy to use, there aren't even any settings. Activate it, and orders will automatically become sequential.
 
-If you have no orders in your store, your orders will begin counting from order number 1. If you have existing orders, the count will pick up from your highest order number. 
+If you have no orders in your store, your orders will begin counting from order number 1. If you have existing orders, the count will pick up from your highest order number.
 
 If you've placed test orders, you must trash **and** permanently delete them to begin ordering at "1" (trashed orders have to be counted in case they're restored, so they need to be gone completely).
 
@@ -34,7 +34,7 @@ If you like this plugin, but are looking for the ability to set the starting num
  - Check out the [Pro Version](http://www.woothemes.com/products/sequential-order-numbers-pro/).
  - View more of SkyVerge's [free WooCommerce extensions](http://profiles.wordpress.org/skyverge/)
  - View all [SkyVerge WooCommerce extensions](http://www.skyverge.com/shop/)
- 
+
 Interested in contributing? You can [find the project on GitHub](https://github.com/skyverge/woocommerce-sequential-order-numbers) and contributions are welcome :)
 
 == Installation ==
@@ -58,7 +58,7 @@ The plugin doesn't require any :) When you activate it, it gets to work right aw
 
 = Why doesn't my payment gateway use this number? =
 
-For full compatibility with extensions which alter the order number, such as Sequential Order Numbers, WooCommerce extensions should use `$order->get_order_number();` rather than `$order->id` when referencing the order number. 
+For full compatibility with extensions which alter the order number, such as Sequential Order Numbers, WooCommerce extensions should use `$order->get_order_number();` rather than `$order->id` when referencing the order number.
 
 If your extension is not displaying the correct order number, you can try contacting the developers of your payment gateway to see if it's possible to make this tiny change. Using the order number instead is both compatible with WooCommerce core and our plugin, as without the order number being changed, it will be equal to the order ID.
 
@@ -84,7 +84,7 @@ Some other notes to help developers:
 
 = Get an order from order number =
 
-If you want to access the order based on the sequential order number, you can do so with a helper method: 
+If you want to access the order based on the sequential order number, you can do so with a helper method:
 
 `
 $order_id = $GLOBALS['wc_seq_order_number']->find_order_by_order_number( $order_number );
@@ -102,6 +102,10 @@ $order_number = $order->get_order_number();
 `
 
 == Changelog ==
+
+= 1.7.0 - 2016.05.24 =
+* Misc - Added support for WooCommerce 2.6
+* Misc - Removed support for WooCommerce 2.3
 
 = 1.6.1 - 2016.02.04 =
 * Misc - WooCommerce Subscriptions: Use new hook wcs_renewal_order_meta_query instead of deprecated woocommerce_subscriptions_renewal_order_meta_query

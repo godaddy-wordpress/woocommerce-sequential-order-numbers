@@ -5,7 +5,7 @@
  * Description: Provides sequential order numbers for WooCommerce orders
  * Author: SkyVerge
  * Author URI: http://www.skyverge.com
- * Version: 1.6.1
+ * Version: 1.7.0
  * Text Domain: woocommerce-sequential-order-numbers
  * Domain Path: /i18n/languages/
  *
@@ -21,7 +21,7 @@
  * @license   http://www.gnu.org/licenses/gpl-3.0.html GNU General Public License v3.0
  */
 
-if ( ! defined( 'ABSPATH' ) ) exit; // Exit if accessed directly
+defined( 'ABSPATH' ) or exit;
 
 // Check if WooCommerce is active
 if ( ! WC_Seq_Order_Number::is_woocommerce_active() ) {
@@ -39,13 +39,13 @@ class WC_Seq_Order_Number {
 
 
 	/** version number */
-	const VERSION = '1.6.1';
+	const VERSION = '1.7.0';
 
 	/** version option name */
 	const VERSION_OPTION_NAME = 'woocommerce_seq_order_number_db_version';
 
 	/** minimum required wc version */
-	const MINIMUM_WC_VERSION = '2.3';
+	const MINIMUM_WC_VERSION = '2.4.13';
 
 
 	/**
@@ -203,7 +203,7 @@ class WC_Seq_Order_Number {
 	 *
 	 * @param string $order_number the order id with a leading hash
 	 * @param WC_Order $order the order object
-	 * @return string custom order number, with leading hash for < WC 2.3
+	 * @return string custom order number
 	 */
 	public function get_order_number( $order_number, $order ) {
 
@@ -368,24 +368,24 @@ class WC_Seq_Order_Number {
 
 
 	/**
-	 * Returns true if the installed version of WooCommerce is 2.4 or greater
+	 * Returns true if the installed version of WooCommerce is 2.5 or greater
 	 *
 	 * @since 1.6.0
-	 * @return boolean true if the installed version of WooCommerce is 2.3 or greater
+	 * @return boolean true if the installed version of WooCommerce is 2.5 or greater
 	 */
-	public static function is_wc_version_gte_2_4() {
-		return self::get_wc_version() && version_compare( self::get_wc_version(), '2.4', '>=' );
+	public static function is_wc_version_gte_2_5() {
+		return self::get_wc_version() && version_compare( self::get_wc_version(), '2.5', '>=' );
 	}
 
 
 	/**
-	 * Returns true if the installed version of WooCommerce is 2.5 or greater
+	 * Returns true if the installed version of WooCommerce is 2.6 or greater
 	 *
-	 * @since 1.6.0
-	 * @return boolean true if the installed version of WooCommerce is 2.3 or greater
+	 * @since 1.7.0
+	 * @return boolean true if the installed version of WooCommerce is 2.6 or greater
 	 */
-	public static function is_wc_version_gte_2_5() {
-		return self::get_wc_version() && version_compare( self::get_wc_version(), '2.5', '>=' );
+	public static function is_wc_version_gte_2_6() {
+		return self::get_wc_version() && version_compare( self::get_wc_version(), '2.6', '>=' );
 	}
 
 
