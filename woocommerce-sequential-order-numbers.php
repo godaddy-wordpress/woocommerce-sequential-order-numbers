@@ -28,18 +28,14 @@ if ( ! WC_Seq_Order_Number::is_woocommerce_active() ) {
 	return;
 }
 
-/**
- * The WC_Seq_Order_Number global object
- * @name $wc_seq_order_number
- * @global WC_Seq_Order_Number $GLOBALS['wc_seq_order_number']
- */
-$GLOBALS['wc_seq_order_number'] = new WC_Seq_Order_Number();
-
 class WC_Seq_Order_Number {
 
 
 	/** version number */
 	const VERSION = '1.7.0';
+
+	/** @var \WC_Seq_Order_Number single instance of this plugin */
+	protected static $instance;
 
 	/** version option name */
 	const VERSION_OPTION_NAME = 'woocommerce_seq_order_number_db_version';
@@ -57,6 +53,30 @@ class WC_Seq_Order_Number {
 
 		add_action( 'plugins_loaded', array( $this, 'initialize' ) );
 		add_action( 'init',           array( $this, 'load_translation' ) );
+	}
+
+
+	/**
+	 * Cloning instances is forbidden due to singleton pattern.
+	 *
+	 * @since 1.7.0
+	 */
+	public function __clone() {
+
+		/* translators: Placeholders: %s - plugin name */
+		_doing_it_wrong( __FUNCTION__, sprintf( esc_html__( 'You cannot clone instances of %s.', 'woocommerce-sequential-order-numbers' ), $this->get_plugin_name() ), '1.7.0' );
+	}
+
+
+	/**
+	 * Unserializing instances is forbidden due to singleton pattern.
+	 *
+	 * @since 1.7.0
+	 */
+	public function __wakeup() {
+
+		/* translators: Placeholders: %s - plugin name */
+		_doing_it_wrong( __FUNCTION__, sprintf( esc_html__( 'You cannot unserialize instances of %s.', 'woocommerce-sequential-order-numbers' ), $this->get_plugin_name() ), '1.7.0' );
 	}
 
 
@@ -336,6 +356,21 @@ class WC_Seq_Order_Number {
 
 
 	/**
+	 * Main Sequential Order Numbers Instance, ensures only one instance is/can be loaded
+	 *
+	 * @since 1.7.0
+	 * @see wc_sequential_order_numbers()
+	 * @return \WC_Seq_Order_Number
+	 */
+	public static function instance() {
+		if ( is_null( self::$instance ) ) {
+			self::$instance = new self();
+		}
+		return self::$instance;
+	}
+
+
+	/**
 	 * Checks if WooCommerce is active
 	 *
 	 * @since 1.3
@@ -496,3 +531,39 @@ class WC_Seq_Order_Number {
 
 
 }
+
+
+/**
+ * Returns the One True Instance of Sequential Order Numbers
+ *
+ * @since 1.7.0
+ * @return \WC_Seq_Order_Number
+ */
+function wc_sequential_order_numbers() {
+	return WC_Seq_Order_Number::instance();
+}
+
+
+/**
+ * Returns the One True Instance of Sequential Order Numbers after warning that
+ * the global has been deprecated
+ *
+ * @since 1.7.0
+ * @return \WC_Seq_Order_Number
+ */
+function wc_sequential_order_numbers_deprecated_global() {
+
+	/* @deprecated since 1.7.0 */
+	_deprecated_function( "\$GLOBALS['wc_seq_order_number']", '1.7.0', 'wc_sequential_order_numbers()' );
+
+	return wc_sequential_order_numbers();
+}
+
+
+/**
+ * The WC_Seq_Order_Number global object
+ * @deprecated 1.7.0
+ * @name $wc_seq_order_number
+ * @global WC_Seq_Order_Number $GLOBALS['wc_seq_order_number']
+ */
+$GLOBALS['wc_seq_order_number'] = wc_sequential_order_numbers_deprecated_global();

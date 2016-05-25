@@ -87,7 +87,7 @@ Some other notes to help developers:
 If you want to access the order based on the sequential order number, you can do so with a helper method:
 
 `
-$order_id = $GLOBALS['wc_seq_order_number']->find_order_by_order_number( $order_number );
+$order_id = wc_sequential_order_numbers()->find_order_by_order_number( $order_number );
 `
 
 This will give you the order's ID (post ID), and you can get the order object from this.
