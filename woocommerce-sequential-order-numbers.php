@@ -64,7 +64,7 @@ class WC_Seq_Order_Number {
 	public function __clone() {
 
 		/* translators: Placeholders: %s - plugin name */
-		_doing_it_wrong( __FUNCTION__, sprintf( esc_html__( 'You cannot clone instances of %s.', 'woocommerce-sequential-order-numbers' ), $this->get_plugin_name() ), '1.7.0' );
+		_doing_it_wrong( __FUNCTION__, sprintf( esc_html__( 'You cannot clone instances of %s.', 'woocommerce-sequential-order-numbers' ), 'WooCommerce Sequential Order Numbers' ), '1.7.0' );
 	}
 
 
@@ -76,7 +76,7 @@ class WC_Seq_Order_Number {
 	public function __wakeup() {
 
 		/* translators: Placeholders: %s - plugin name */
-		_doing_it_wrong( __FUNCTION__, sprintf( esc_html__( 'You cannot unserialize instances of %s.', 'woocommerce-sequential-order-numbers' ), $this->get_plugin_name() ), '1.7.0' );
+		_doing_it_wrong( __FUNCTION__, sprintf( esc_html__( 'You cannot unserialize instances of %s.', 'woocommerce-sequential-order-numbers' ), 'WooCommerce Sequential Order Numbers' ), '1.7.0' );
 	}
 
 
