@@ -247,7 +247,7 @@ class WC_Seq_Order_Number {
 	public function woocommerce_custom_shop_order_orderby( $vars ) {
 		global $typenow, $wp_query;
 
-		if ( 'shop_order' === $typenow ) {
+		if ( 'shop_order' !== $typenow ) {
 			return $vars;
 		}
 
