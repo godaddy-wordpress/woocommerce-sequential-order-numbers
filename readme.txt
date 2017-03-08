@@ -27,11 +27,11 @@ We do support our free plugins and extensions, but please understand that suppor
 
 = Sequential Order Numbers Pro =
 
-If you like this plugin, but are looking for the ability to set the starting number, or to add a custom prefix/suffix to your order numbers (ie, you'd prefer something like WT101UK, WT102UK, etc) please consider our premium WooCommerce Sequential Order Numbers Pro plugin, which is available in the [WooThemes Store](http://www.woothemes.com/products/sequential-order-numbers-pro/).
+If you like this plugin, but are looking for the ability to set the starting number, or to add a custom prefix/suffix to your order numbers (ie, you'd prefer something like WT101UK, WT102UK, etc) please consider our premium WooCommerce Sequential Order Numbers Pro plugin, which is available in the [WooCommerce Store](http://woocommerce.com/products/sequential-order-numbers-pro/).
 
 = More Details =
  - See the [product page](http://www.skyverge.com/product/woocommerce-sequential-order-numbers/) for full details.
- - Check out the [Pro Version](http://www.woothemes.com/products/sequential-order-numbers-pro/).
+ - Check out the [Pro Version](http://woocommerce.com/products/sequential-order-numbers-pro/).
  - View more of SkyVerge's [free WooCommerce extensions](http://profiles.wordpress.org/skyverge/)
  - View all [SkyVerge WooCommerce extensions](http://www.skyverge.com/shop/)
 
@@ -105,6 +105,8 @@ $order_number = $order->get_order_number();
 
 = 1.8.0-dev - 2017.nn.nn =
 * Fix - Admin orderby was not properly scoped to orders, props [@brandondove](https://github.com/brandondove)
+* Misc - Added support for WooCommerce 2.7
+* Misc - Removed support for WooCommerce 2.4
 
 = 1.7.0 - 2016.05.24 =
 * Misc - Added support for WooCommerce 2.6
