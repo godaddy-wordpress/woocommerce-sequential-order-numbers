@@ -1,11 +1,11 @@
 === WooCommerce Sequential Order Numbers ===
-Contributors: SkyVerge, maxrice, tamarazuk, chasewiseman, nekojira
-Tags: woocommerce, order number
+Contributors: SkyVerge, maxrice, tamarazuk, chasewiseman, nekojira, beka.rice
+Tags: woocommerce, order number, sequential order number, woocommerce orders
 Requires at least: 4.1
-Tested up to: 4.6.1.
-Requires WooCommerce at least: 2.4.13
-Tested WooCommerce up to: 2.6.n
-Stable tag: 1.7.0
+Tested up to: 4.7.3
+Requires WooCommerce at least: 2.5.5
+Tested WooCommerce up to: 2.7.0
+Stable tag: 1.8.0-dev
 
 This plugin extends WooCommerce by setting sequential order numbers for new orders.
 
@@ -13,7 +13,7 @@ This plugin extends WooCommerce by setting sequential order numbers for new orde
 
 This plugin extends WooCommerce by automatically setting sequential order numbers for new orders.  If there are existing orders at the time of installation, the sequential order numbers will start with the highest current order number.
 
-**This plugin requires WooCommerce 2.4.13 or newer.**
+**This plugin requires WooCommerce 2.5.5 or newer.**
 
 > No configuration needed! The plugin is so easy to use, there aren't even any settings. Activate it, and orders will automatically become sequential.
 
@@ -103,7 +103,7 @@ $order_number = $order->get_order_number();
 
 == Changelog ==
 
-= 1.7.0-1 - 2016.nn.nn =
+= 1.8.0-dev - 2017.nn.nn =
 * Fix - Admin orderby was not properly scoped to orders, props [@brandondove](https://github.com/brandondove)
 
 = 1.7.0 - 2016.05.24 =

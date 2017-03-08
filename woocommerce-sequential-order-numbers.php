@@ -5,11 +5,11 @@
  * Description: Provides sequential order numbers for WooCommerce orders
  * Author: SkyVerge
  * Author URI: http://www.skyverge.com
- * Version: 1.7.0-1
+ * Version: 1.8.0-dev
  * Text Domain: woocommerce-sequential-order-numbers
  * Domain Path: /i18n/languages/
  *
- * Copyright: (c) 2012-2016 SkyVerge, Inc. (info@skyverge.com)
+ * Copyright: (c) 2012-2017, SkyVerge, Inc. (info@skyverge.com)
  *
  * License: GNU General Public License v3.0
  * License URI: http://www.gnu.org/licenses/gpl-3.0.html
@@ -17,7 +17,7 @@
  * @package   WC-Sequential-Order-Numbers
  * @author    SkyVerge
  * @category  Plugin
- * @copyright Copyright (c) 2012-2016, SkyVerge, Inc.
+ * @copyright Copyright (c) 2012-2017, SkyVerge, Inc.
  * @license   http://www.gnu.org/licenses/gpl-3.0.html GNU General Public License v3.0
  */
 
@@ -32,7 +32,7 @@ class WC_Seq_Order_Number {
 
 
 	/** version number */
-	const VERSION = '1.7.0-1';
+	const VERSION = '1.8.0-dev';
 
 	/** @var \WC_Seq_Order_Number single instance of this plugin */
 	protected static $instance;
@@ -41,7 +41,7 @@ class WC_Seq_Order_Number {
 	const VERSION_OPTION_NAME = 'woocommerce_seq_order_number_db_version';
 
 	/** minimum required wc version */
-	const MINIMUM_WC_VERSION = '2.4.13';
+	const MINIMUM_WC_VERSION = '2.5.5';
 
 
 	/**
@@ -388,7 +388,6 @@ class WC_Seq_Order_Number {
 	}
 
 
-	/** Compatibility Methods ******************************************************/
 
 
 	/**
@@ -468,8 +467,11 @@ class WC_Seq_Order_Number {
 
 	/**
 	 * Run every time.  Used since the activation hook is not executed when updating a plugin
+	 *
+	 * @since 1.0.0
 	 */
 	private function install() {
+
 		$installed_version = get_option( WC_Seq_Order_Number::VERSION_OPTION_NAME );
 
 		if ( ! $installed_version ) {
@@ -524,6 +526,8 @@ class WC_Seq_Order_Number {
 
 	/**
 	 * Run when plugin version number changes
+	 *
+	 * 1.0.0
 	 */
 	private function upgrade( $installed_version ) {
 		// upgrade code goes here
