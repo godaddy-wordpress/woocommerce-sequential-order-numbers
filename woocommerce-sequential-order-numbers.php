@@ -311,6 +311,8 @@ class WC_Seq_Order_Number {
 	/**
 	 * Returns true if the installed version of WooCommerce Subscriptions is 2.0.0 or greater
 	 *
+	 * TODO: Drop Subs < 2.0 support with WC 3.1 compat {BR 2017-03-21}
+	 *
 	 * @since 1.5.1
 	 * @return boolean
 	 */
@@ -391,9 +393,9 @@ class WC_Seq_Order_Number {
 
 
 	/**
-	 * Helper method to get order properties pre and post WC 2.7.
+	 * Helper method to get order properties pre and post WC 3.0.
 	 *
-	 * TODO: Remove this when WooCommerce 2.7+ is required and remove helpers {BR 2017-03-08}
+	 * TODO: Remove this when WooCommerce 3.0+ is required and remove helpers {BR 2017-03-08}
 	 *
 	 * @param \WC_Order $order the order for which to get data
 	 * @param string $prop the order property to get
@@ -404,7 +406,7 @@ class WC_Seq_Order_Number {
 
 		$value = '';
 
-		if ( self::is_wc_version_gte_2_7() ) {
+		if ( self::is_wc_version_gte_3_0() ) {
 
 			if ( is_callable( array( $order, "get_{$prop}" ) ) ) {
 				$value = $order->{"get_{$prop}"}( $context );
@@ -425,9 +427,9 @@ class WC_Seq_Order_Number {
 
 
 	/**
-	 * Helper method to get order meta pre and post WC 2.7.
+	 * Helper method to get order meta pre and post WC 3.0.
 	 *
-	 * TODO: Remove this when WooCommerce 2.7+ is required and remove helpers {BR 2017-03-08}
+	 * TODO: Remove this when WooCommerce 3.0+ is required and remove helpers {BR 2017-03-08}
 	 *
 	 * @param \WC_Order $order the order object
 	 * @param string $key the meta key
@@ -437,7 +439,7 @@ class WC_Seq_Order_Number {
 	 */
 	protected static function get_order_meta( WC_Order $order, $key = '', $single = true, $context = 'edit' ) {
 
-		if (  self::is_wc_version_gte_2_7() ) {
+		if (  self::is_wc_version_gte_3_0() ) {
 
 			$value = $order->get_meta( $key, $single, $context );
 
@@ -467,13 +469,13 @@ class WC_Seq_Order_Number {
 
 
 	/**
-	 * Returns true if the installed version of WooCommerce is 2.7 or greater
+	 * Returns true if the installed version of WooCommerce is 3.0 or greater
 	 *
 	 * @since 1.8.0-dev
-	 * @return boolean true if the installed version of WooCommerce is 2.7 or greater
+	 * @return boolean true if the installed version of WooCommerce is 3.0 or greater
 	 */
-	private static function is_wc_version_gte_2_7() {
-		return self::get_wc_version() && version_compare( self::get_wc_version(), '2.7', '>=' );
+	private static function is_wc_version_gte_3_0() {
+		return self::get_wc_version() && version_compare( self::get_wc_version(), '3.0', '>=' );
 	}
 
 
@@ -606,6 +608,9 @@ function wc_sequential_order_numbers() {
 
 /**
  * The WC_Seq_Order_Number global object
+ *
+ * TODO: Remove the global with WC 3.1 compat {BR 2017-03-21}
+ *
  * @deprecated 1.7.0
  * @name $wc_seq_order_number
  * @global WC_Seq_Order_Number $GLOBALS['wc_seq_order_number']
