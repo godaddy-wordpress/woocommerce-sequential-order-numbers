@@ -1,11 +1,11 @@
 === WooCommerce Sequential Order Numbers ===
-Contributors: SkyVerge, maxrice, tamarazuk, chasewiseman, nekojira
-Tags: woocommerce, order number
+Contributors: SkyVerge, maxrice, tamarazuk, chasewiseman, nekojira, beka.rice
+Tags: woocommerce, order number, sequential order number, woocommerce orders
 Requires at least: 4.1
-Tested up to: 4.6.1.
-Requires WooCommerce at least: 2.4.13
-Tested WooCommerce up to: 2.6.n
-Stable tag: 1.7.0
+Tested up to: 4.7.3
+Requires WooCommerce at least: 2.5.5
+Tested WooCommerce up to: 3.0
+Stable tag: 1.8.0
 
 This plugin extends WooCommerce by setting sequential order numbers for new orders.
 
@@ -13,7 +13,7 @@ This plugin extends WooCommerce by setting sequential order numbers for new orde
 
 This plugin extends WooCommerce by automatically setting sequential order numbers for new orders.  If there are existing orders at the time of installation, the sequential order numbers will start with the highest current order number.
 
-**This plugin requires WooCommerce 2.4.13 or newer.**
+**This plugin requires WooCommerce 2.5.5 or newer.**
 
 > No configuration needed! The plugin is so easy to use, there aren't even any settings. Activate it, and orders will automatically become sequential.
 
@@ -27,11 +27,11 @@ We do support our free plugins and extensions, but please understand that suppor
 
 = Sequential Order Numbers Pro =
 
-If you like this plugin, but are looking for the ability to set the starting number, or to add a custom prefix/suffix to your order numbers (ie, you'd prefer something like WT101UK, WT102UK, etc) please consider our premium WooCommerce Sequential Order Numbers Pro plugin, which is available in the [WooThemes Store](http://www.woothemes.com/products/sequential-order-numbers-pro/).
+If you like this plugin, but are looking for the ability to set the starting number, or to add a custom prefix/suffix to your order numbers (ie, you'd prefer something like WT101UK, WT102UK, etc) please consider our premium WooCommerce Sequential Order Numbers Pro plugin, which is available in the [WooCommerce Store](http://woocommerce.com/products/sequential-order-numbers-pro/).
 
 = More Details =
  - See the [product page](http://www.skyverge.com/product/woocommerce-sequential-order-numbers/) for full details.
- - Check out the [Pro Version](http://www.woothemes.com/products/sequential-order-numbers-pro/).
+ - Check out the [Pro Version](http://woocommerce.com/products/sequential-order-numbers-pro/).
  - View more of SkyVerge's [free WooCommerce extensions](http://profiles.wordpress.org/skyverge/)
  - View all [SkyVerge WooCommerce extensions](http://www.skyverge.com/shop/)
 
@@ -103,8 +103,10 @@ $order_number = $order->get_order_number();
 
 == Changelog ==
 
-= 1.7.0-1 - 2016.nn.nn =
+= 1.8.0 - 2017.03.23 =
 * Fix - Admin orderby was not properly scoped to orders, props [@brandondove](https://github.com/brandondove)
+* Misc - Added support for WooCommerce 3.0
+* Misc - Removed support for WooCommerce 2.4
 
 = 1.7.0 - 2016.05.24 =
 * Misc - Added support for WooCommerce 2.6
