@@ -402,7 +402,7 @@ class WC_Seq_Order_Number {
 	 * @param string $context the context for the property, 'edit' or 'view'
 	 * @return mixed the order property
 	 */
-	protected static function get_order_prop( WC_Order $order, $prop, $context = 'edit' ) {
+	protected static function get_order_prop( $order, $prop, $context = 'edit' ) {
 
 		$value = '';
 
@@ -437,7 +437,7 @@ class WC_Seq_Order_Number {
 	 * @param string $context if 'view' then the value will be filtered
 	 * @return mixed the order property
 	 */
-	protected static function get_order_meta( WC_Order $order, $key = '', $single = true, $context = 'edit' ) {
+	protected static function get_order_meta( $order, $key = '', $single = true, $context = 'edit' ) {
 
 		if (  self::is_wc_version_gte_3_0() ) {
 
@@ -447,7 +447,6 @@ class WC_Seq_Order_Number {
 
 			$order_id = is_callable( array( $order, 'get_id' ) ) ? $order->get_id() : $order->id;
 			$value    = get_post_meta( $order_id, $key, $single );
-
 		}
 
 		return $value;
