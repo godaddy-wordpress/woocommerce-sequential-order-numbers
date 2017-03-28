@@ -103,6 +103,9 @@ $order_number = $order->get_order_number();
 
 == Changelog ==
 
+= 1.8.1 - 2017.03.28 =
+* Fix - Removes errors on refund number display
+
 = 1.8.0 - 2017.03.23 =
 * Fix - Admin orderby was not properly scoped to orders, props [@brandondove](https://github.com/brandondove)
 * Misc - Added support for WooCommerce 3.0

@@ -2,7 +2,7 @@
 # This file is distributed under the GNU General Public License v3.0.
 msgid ""
 msgstr ""
-"Project-Id-Version: WooCommerce Sequential Order Numbers 1.8.0\n"
+"Project-Id-Version: WooCommerce Sequential Order Numbers 1.8.1\n"
 "Report-Msgid-Bugs-To: "
 "https://github.com/skyverge/woocommerce-sequential-order-numbers/issues\n"
 "POT-Creation-Date: 2014-09-05 22:27:38+00:00\n"
@@ -23,14 +23,14 @@ msgstr ""
 msgid "You cannot unserialize instances of %s."
 msgstr ""
 
-#: woocommerce-sequential-order-numbers.php:551
+#: woocommerce-sequential-order-numbers.php:550
 #. Translators: %s - error message(s)
 msgid ""
 "Error activating and installing <strong>WooCommerce Sequential Order "
 "Numbers</strong>: %s"
 msgstr ""
 
-#: woocommerce-sequential-order-numbers.php:552
+#: woocommerce-sequential-order-numbers.php:551
 msgid "&laquo; Go Back"
 msgstr ""
 
