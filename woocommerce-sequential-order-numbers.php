@@ -482,12 +482,17 @@ class WC_Seq_Order_Number {
 	 */
 	public function render_update_notices() {
 
-		echo '<div class="error"><p>The following plugin is inactive because it requires a newer version of WooCommerce:</p><ul>';
+		$message = sprintf(
+			/* translators: Placeholders: %1$s - plugin name; %2$s - WooCommerce version; %3$s, %5$s - <a> tags; %4$s - </a> tag */
+			esc_html__( '%1$s is inactive because it requires WooCommerce %2$s or newer. Please %3$supdate WooCommerce%4$s or run the %5$sWooCommerce database upgrade%4$s.', 'woocommerce-sequential-order-numbers' ),
+			'Sequential Order Numbers',
+			self::MINIMUM_WC_VERSION,
+			'<a href="' . admin_url( 'update-core.php' ) . '">',
+			'</a>',
+			'<a href="' . admin_url( 'plugins.php?do_update_woocommerce=true' ) . '">'
+		);
 
-		printf( '<li>%1$s requires WooCommerce %2$s or newer</li>', 'Sequential Order Numbers', self::MINIMUM_WC_VERSION );
-
-		echo '</ul><p>Please <a href="' . admin_url( 'update-core.php' ) . '">update WooCommerce&nbsp;&raquo;</a></p></div>';
-
+		printf( '<div class="error"><p>%s</p></div>', $message );
 	}
 
 
