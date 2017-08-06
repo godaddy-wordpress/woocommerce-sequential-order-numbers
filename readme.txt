@@ -105,6 +105,7 @@ $order_number = $order->get_order_number();
 
 = 1.8.2-dev - 2017.nn.nn =
 * Fix - PHP deprecation warning when Subscriptions is used
+* Misc - Removed support for WooCommerce Subscriptions older than v2.0
 
 = 1.8.1 - 2017.03.28 =
 * Fix - Removes errors on refund number display

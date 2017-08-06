@@ -105,13 +105,8 @@ class WC_Seq_Order_Number {
 		add_filter( 'woocommerce_shortcode_order_tracking_order_id', array( $this, 'find_order_by_order_number' ) );
 
 		// WC Subscriptions support
-		if ( self::is_wc_subscriptions_version_gte_2_0() ) {
-			add_filter( 'wcs_renewal_order_meta_query',                       array( $this, 'subscriptions_remove_renewal_order_meta' ) );
-			add_filter( 'wcs_renewal_order_created',                          array( $this, 'subscriptions_set_sequential_order_number' ), 10, 2 );
-		} else {
-			add_filter( 'woocommerce_subscriptions_renewal_order_meta_query', array( $this, 'subscriptions_remove_renewal_order_meta' ) );
-			add_action( 'woocommerce_subscriptions_renewal_order_created',    array( $this, 'subscriptions_set_sequential_order_number' ), 10, 2 );
-		}
+		add_filter( 'wcs_renewal_order_meta_query', array( $this, 'subscriptions_remove_renewal_order_meta' ) );
+		add_filter( 'wcs_renewal_order_created',    array( $this, 'subscriptions_set_sequential_order_number' ), 10, 2 );
 
 		if ( is_admin() ) {
 			add_filter( 'request',                              array( $this, 'woocommerce_custom_shop_order_orderby' ), 20 );
@@ -298,46 +293,25 @@ class WC_Seq_Order_Number {
 
 
 	/**
-	 * Helper method to get the version of WooCommerce Subscriptions
-	 *
-	 * @since 1.5.1
-	 * @return string|null WC_Subscriptions version number or null if not found
-	 */
-	protected static function get_wc_subscriptions_version() {
-		return class_exists( 'WC_Subscriptions' ) && ! empty( WC_Subscriptions::$version ) ? WC_Subscriptions::$version : null;
-	}
-
-
-	/**
-	 * Returns true if the installed version of WooCommerce Subscriptions is 2.0.0 or greater
-	 *
-	 * TODO: Drop Subs < 2.0 support with WC 3.1 compat {BR 2017-03-21}
-	 *
-	 * @since 1.5.1
-	 * @return boolean
-	 */
-	protected static function is_wc_subscriptions_version_gte_2_0() {
-		return self::get_wc_subscriptions_version() && version_compare( self::get_wc_subscriptions_version(), '2.0-beta-1', '>=' );
-	}
-
-
-	/**
 	 * Sets an order number on a subscriptions-created order
 	 *
 	 * @since 1.3
 	 * @param \WC_Order $renewal_order the new renewal order object
-	 * @param \WC_Order $original_order the original order object (Subscriptions 2.0+: Subscription object)
-	 * @return void|\WC_Order Void for Subscriptions 1.5, renewal order instance for Subscriptions 2.0+
+	 * @param  \WC_Subscription $subscription Post ID of a 'shop_subscription' post, or instance of a WC_Subscription object
+	 * @return \WC_Order renewal order instance
 	 */
-	public function subscriptions_set_sequential_order_number( $renewal_order, $original_order ) {
+	public function subscriptions_set_sequential_order_number( $renewal_order, $subscription ) {
 
-		$this->set_sequential_order_number( $order_post->ID, $order_post );
-
-		// after 2.0 this callback needs to return the renewal order
-		if ( self::is_wc_subscriptions_version_gte_2_0() ) {
+		// sanity check
+		if ( ! $renewal_order instanceof WC_Order ) {
 			return $renewal_order;
 		}
+
 		$order_post = get_post( self::get_order_prop( $renewal_order, 'id' ) );
+		$this->set_sequential_order_number( $order_post->ID, $order_post );
+
+		// after Subs 2.0 this callback needs to return the renewal order
+		return $renewal_order;
 	}
 
 
@@ -573,6 +547,7 @@ class WC_Seq_Order_Number {
 		}
 
 		if ( $installed_version !== WC_Seq_Order_Number::VERSION ) {
+
 			$this->upgrade( $installed_version );
 
 			// new version number
