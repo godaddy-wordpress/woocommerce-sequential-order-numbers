@@ -5,7 +5,7 @@
  * Description: Provides sequential order numbers for WooCommerce orders
  * Author: SkyVerge
  * Author URI: http://www.skyverge.com
- * Version: 1.8.1
+ * Version: 1.8.2-dev
  * Text Domain: woocommerce-sequential-order-numbers
  * Domain Path: /i18n/languages/
  *
@@ -32,7 +32,7 @@ class WC_Seq_Order_Number {
 
 
 	/** version number */
-	const VERSION = '1.8.1';
+	const VERSION = '1.8.2-dev';
 
 	/** @var \WC_Seq_Order_Number single instance of this plugin */
 	protected static $instance;
@@ -201,10 +201,10 @@ class WC_Seq_Order_Number {
 
 				// attempt the query up to 3 times for a much higher success rate if it fails (due to Deadlock)
 				$success = false;
+
 				for ( $i = 0; $i < 3 && ! $success; $i++ ) {
 
 					// this seems to me like the safest way to avoid order number clashes
-					// By the time this is outdated, it's likely no longer needed anyway {BR 2017-03-08}
 					$query = $wpdb->prepare( "
 						INSERT INTO {$wpdb->postmeta} (post_id, meta_key, meta_value)
 						SELECT %d, '_order_number', IF( MAX( CAST( meta_value as UNSIGNED ) ) IS NULL, 1, MAX( CAST( meta_value as UNSIGNED ) ) + 1 )
@@ -331,13 +331,13 @@ class WC_Seq_Order_Number {
 	 */
 	public function subscriptions_set_sequential_order_number( $renewal_order, $original_order ) {
 
-		$order_post = get_post( $renewal_order->id );
 		$this->set_sequential_order_number( $order_post->ID, $order_post );
 
 		// after 2.0 this callback needs to return the renewal order
 		if ( self::is_wc_subscriptions_version_gte_2_0() ) {
 			return $renewal_order;
 		}
+		$order_post = get_post( self::get_order_prop( $renewal_order, 'id' ) );
 	}
 
 
