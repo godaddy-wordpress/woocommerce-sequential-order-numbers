@@ -2,10 +2,10 @@
 Contributors: SkyVerge, maxrice, tamarazuk, chasewiseman, nekojira, beka.rice
 Tags: woocommerce, order number, sequential order number, woocommerce orders
 Requires at least: 4.1
-Tested up to: 4.8
+Tested up to: 4.8.1
 WC requires at least: 2.5.5
 WC tested up to: 3.1.0
-Stable tag: 1.8.2-dev
+Stable tag: 1.8.2
 
 This plugin extends WooCommerce by setting sequential order numbers for new orders.
 
@@ -103,7 +103,7 @@ $order_number = $order->get_order_number();
 
 == Changelog ==
 
-= 1.8.2-dev - 2017.nn.nn =
+= 1.8.2 - 2017.08.22 =
 * Fix - PHP deprecation warning when Subscriptions is used
 * Misc - Removed support for WooCommerce Subscriptions older than v2.0
 
