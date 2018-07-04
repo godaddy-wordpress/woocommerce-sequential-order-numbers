@@ -5,11 +5,11 @@
  * Description: Provides sequential order numbers for WooCommerce orders
  * Author: SkyVerge
  * Author URI: http://www.skyverge.com
- * Version: 1.8.2
+ * Version: 1.8.3-dev.1
  * Text Domain: woocommerce-sequential-order-numbers
  * Domain Path: /i18n/languages/
  *
- * Copyright: (c) 2012-2017, SkyVerge, Inc. (info@skyverge.com)
+ * Copyright: (c) 2012-2018, SkyVerge, Inc. (info@skyverge.com)
  *
  * License: GNU General Public License v3.0
  * License URI: http://www.gnu.org/licenses/gpl-3.0.html
@@ -17,14 +17,17 @@
  * @package   WC-Sequential-Order-Numbers
  * @author    SkyVerge
  * @category  Plugin
- * @copyright Copyright (c) 2012-2017, SkyVerge, Inc.
+ * @copyright Copyright (c) 2012-2018, SkyVerge, Inc.
  * @license   http://www.gnu.org/licenses/gpl-3.0.html GNU General Public License v3.0
+ *
+ * WC requires at least: 2.6.14
+ * WC tested up to: 3.4.3
  */
 
 defined( 'ABSPATH' ) or exit;
 
 // Check if WooCommerce is active
-if ( ! WC_Seq_Order_Number::is_woocommerce_active() ) {
+if ( ! WC_Seq_Order_Number::is_plugin_active( 'woocommerce.php' ) ) {
 	return;
 }
 
@@ -32,16 +35,16 @@ class WC_Seq_Order_Number {
 
 
 	/** version number */
-	const VERSION = '1.8.2';
+	const VERSION = '1.8.3-dev.1';
+
+	/** minimum required wc version */
+	const MINIMUM_WC_VERSION = '2.6.14';
 
 	/** @var \WC_Seq_Order_Number single instance of this plugin */
 	protected static $instance;
 
 	/** version option name */
 	const VERSION_OPTION_NAME = 'woocommerce_seq_order_number_db_version';
-
-	/** minimum required wc version */
-	const MINIMUM_WC_VERSION = '2.5.5';
 
 
 	/**
@@ -352,17 +355,52 @@ class WC_Seq_Order_Number {
 	 * Checks if WooCommerce is active
 	 *
 	 * @since 1.3
+	 * @deprecated 1.8.3-dev.1
+	 *
 	 * @return bool true if WooCommerce is active, false otherwise
 	 */
 	public static function is_woocommerce_active() {
 
+		_deprecated_function( 'WC_Seq_Order_Number::is_woocommerce_active', '1.6.3-dev.1', 'WC_Seq_Order_Number::is_plugin_active' );
+		return self::is_plugin_active( 'woocommerce.php' );
+	}
+
+
+	/**
+	 * Helper function to determine whether a plugin is active.
+	 *
+	 * @since 1.8.3-dev.1
+	 *
+	 * @param string $plugin_name plugin name, as the plugin-filename.php
+	 * @return boolean true if the named plugin is installed and active
+	 */
+	public static function is_plugin_active( $plugin_name ) {
+
 		$active_plugins = (array) get_option( 'active_plugins', array() );
 
 		if ( is_multisite() ) {
-			$active_plugins = array_merge( $active_plugins, get_site_option( 'active_sitewide_plugins', array() ) );
+			$active_plugins = array_merge( $active_plugins, array_keys( get_site_option( 'active_sitewide_plugins', array() ) ) );
 		}
 
-		return in_array( 'woocommerce/woocommerce.php', $active_plugins ) || array_key_exists( 'woocommerce/woocommerce.php', $active_plugins );
+		$plugin_filenames = array();
+
+		foreach ( $active_plugins as $plugin ) {
+
+			if ( false !== strpos( $plugin, '/' ) ) {
+
+				// normal plugin name (plugin-dir/plugin-filename.php)
+				list( , $filename ) = explode( '/', $plugin );
+
+			} else {
+
+				// no directory, just plugin file
+				$filename = $plugin;
+			}
+
+			$plugin_filenames[] = $filename;
+		}
+
+		return in_array( $plugin_name, $plugin_filenames );
 	}
 
 
@@ -460,6 +498,8 @@ class WC_Seq_Order_Number {
 	 */
 	private function minimum_wc_version_met() {
 
+		$version_met = true;
+
 		// if a plugin defines a minimum WC version, render a notice and skip loading the plugin
 		if ( defined( 'self::MINIMUM_WC_VERSION' ) && version_compare( self::get_wc_version(), self::MINIMUM_WC_VERSION, '<' ) ) {
 
@@ -468,10 +508,10 @@ class WC_Seq_Order_Number {
 				add_action( 'admin_notices', array( $this, 'render_update_notices' ) );
 			}
 
-			return false;
+			$version_met = false;
 		}
 
-		return true;
+		return $version_met;
 	}
 
 
@@ -585,13 +625,5 @@ function wc_sequential_order_numbers() {
 }
 
 
-/**
- * The WC_Seq_Order_Number global object
- *
- * TODO: Remove the global with WC 3.1 compat {BR 2017-03-21}
- *
- * @deprecated 1.7.0
- * @name $wc_seq_order_number
- * @global WC_Seq_Order_Number $GLOBALS['wc_seq_order_number']
- */
-$GLOBALS['wc_seq_order_number'] = wc_sequential_order_numbers();
+// fire it up!
+wc_sequential_order_numbers();
