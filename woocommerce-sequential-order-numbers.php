@@ -361,7 +361,7 @@ class WC_Seq_Order_Number {
 	 */
 	public static function is_woocommerce_active() {
 
-		_deprecated_function( 'WC_Seq_Order_Number::is_woocommerce_active', '1.6.3-dev.1', 'WC_Seq_Order_Number::is_plugin_active' );
+		_deprecated_function( 'WC_Seq_Order_Number::is_woocommerce_active', '1.8.3-dev.1', 'WC_Seq_Order_Number::is_plugin_active' );
 		return self::is_plugin_active( 'woocommerce.php' );
 	}
 
