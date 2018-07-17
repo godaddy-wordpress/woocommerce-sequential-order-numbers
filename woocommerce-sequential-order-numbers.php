@@ -5,7 +5,7 @@
  * Description: Provides sequential order numbers for WooCommerce orders
  * Author: SkyVerge
  * Author URI: http://www.skyverge.com
- * Version: 1.8.3-dev.1
+ * Version: 1.8.3
  * Text Domain: woocommerce-sequential-order-numbers
  * Domain Path: /i18n/languages/
  *
@@ -35,7 +35,7 @@ class WC_Seq_Order_Number {
 
 
 	/** version number */
-	const VERSION = '1.8.3-dev.1';
+	const VERSION = '1.8.3';
 
 	/** minimum required wc version */
 	const MINIMUM_WC_VERSION = '2.6.14';
@@ -355,13 +355,13 @@ class WC_Seq_Order_Number {
 	 * Checks if WooCommerce is active
 	 *
 	 * @since 1.3
-	 * @deprecated 1.8.3-dev.1
+	 * @deprecated 1.8.3
 	 *
 	 * @return bool true if WooCommerce is active, false otherwise
 	 */
 	public static function is_woocommerce_active() {
 
-		_deprecated_function( 'WC_Seq_Order_Number::is_woocommerce_active', '1.8.3-dev.1', 'WC_Seq_Order_Number::is_plugin_active' );
+		_deprecated_function( 'WC_Seq_Order_Number::is_woocommerce_active', '1.8.3', 'WC_Seq_Order_Number::is_plugin_active' );
 		return self::is_plugin_active( 'woocommerce.php' );
 	}
 
@@ -369,7 +369,7 @@ class WC_Seq_Order_Number {
 	/**
 	 * Helper function to determine whether a plugin is active.
 	 *
-	 * @since 1.8.3-dev.1
+	 * @since 1.8.3
 	 *
 	 * @param string $plugin_name plugin name, as the plugin-filename.php
 	 * @return boolean true if the named plugin is installed and active
