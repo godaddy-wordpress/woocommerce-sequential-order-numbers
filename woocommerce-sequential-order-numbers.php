@@ -111,6 +111,11 @@ class WC_Seq_Order_Number {
 		add_filter( 'wcs_renewal_order_meta_query', array( $this, 'subscriptions_remove_renewal_order_meta' ) );
 		add_filter( 'wcs_renewal_order_created',    array( $this, 'subscriptions_set_sequential_order_number' ), 10, 2 );
 
+		// WooCommerce Admin support
+		if ( class_exists( 'WC_Admin_Install', false ) ) {
+			add_filter( 'woocommerce_rest_orders_prepare_object_query', array( $this, 'wc_admin_order_number_api_param' ), 10, 2 );
+		}
+
 		if ( is_admin() ) {
 			add_filter( 'request',                              array( $this, 'woocommerce_custom_shop_order_orderby' ), 20 );
 			add_filter( 'woocommerce_shop_order_search_fields', array( $this, 'custom_search_fields' ) );
@@ -332,6 +337,47 @@ class WC_Seq_Order_Number {
 		return $order_meta_query . " AND meta_key NOT IN ( '_order_number' )";
 	}
 
+	/**
+	 * Hook WooCommerce Admin's order number search to the meta value.
+	 *
+	 * @param array $args Arguments to be passed to WC_Order_Query.
+	 * @param WP_REST_Request $request REST API request being made.
+	 * @return array Arguments to be passed to WC_Order_Query.
+	 */
+	public function wc_admin_order_number_api_param( $args, $request ) {
+		global $wpdb;
+
+		if (
+			'/wc/v4/orders' === $request->get_route() &&
+			isset( $request['number'] )
+		) {
+			// Handles 'number' value here and modify $args.
+			$number_search = trim( $request['number'] );
+			$order_sql     = esc_sql( $args['order'] ); // Order defaults to DESC.
+			$limit         = intval( $args['posts_per_page'] ); // Posts per page defaults to 10.
+
+			// Search Order number meta value instead of Post ID.
+			$order_ids = $wpdb->get_col(
+				$wpdb->prepare(
+					"SELECT post_id
+					FROM {$wpdb->prefix}postmeta
+					WHERE meta_key = '_order_number'
+					AND meta_value LIKE %s
+					ORDER BY post_id {$order_sql}
+					LIMIT %d",
+					$wpdb->esc_like( $number_search ) . '%',
+					$limit
+				)
+			);
+
+			$args['post__in'] = empty( $order_ids ) ? array( 0 ) : $order_ids;
+	
+			// Remove the 'number' parameter to short circuit WooCommerce Admin's handling.
+			unset( $request['number'] );
+		}
+	
+		return $args;
+	}
 
 	/** Helper Methods ******************************************************/
 
