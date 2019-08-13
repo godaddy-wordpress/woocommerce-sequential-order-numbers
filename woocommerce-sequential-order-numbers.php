@@ -178,7 +178,7 @@ class WC_Seq_Order_Number {
 		}
 
 		// _order_number was set, so this is not an old order, it's a new one that just happened to have post_id that matched the searched-for order_number
-		if ( $order->get_meta( '_order_number',true, 'edit' ) ) {
+		if ( $order->get_meta( '_order_number', true, 'edit' ) ) {
 			return 0;
 		}
 
@@ -198,7 +198,7 @@ class WC_Seq_Order_Number {
 		if ( 'shop_order' === $post->post_type && 'auto-draft' !== $post->post_status ) {
 
 			$order        = wc_get_order( $post_id );
-			$order_number = $order->get_meta( '_order_number',true, 'edit' );
+			$order_number = $order->get_meta( '_order_number', true, 'edit' );
 
 			if ( '' === $order_number ) {
 
@@ -232,7 +232,7 @@ class WC_Seq_Order_Number {
 	 */
 	public function get_order_number( $order_number, $order ) {
 
-		if ( $sequential_order_number = $order->get_meta( '_order_number',true, 'edit' ) ) {
+		if ( $sequential_order_number = $order->get_meta( '_order_number', true, 'edit' ) ) {
 			$order_number = $sequential_order_number;
 		}
 
