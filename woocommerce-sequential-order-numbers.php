@@ -5,23 +5,21 @@
  * Description: Provides sequential order numbers for WooCommerce orders
  * Author: SkyVerge
  * Author URI: http://www.skyverge.com
- * Version: 1.8.3
+ * Version: 1.9.0-dev.1
  * Text Domain: woocommerce-sequential-order-numbers
  * Domain Path: /i18n/languages/
  *
- * Copyright: (c) 2012-2018, SkyVerge, Inc. (info@skyverge.com)
+ * Copyright: (c) 2012-2019, SkyVerge, Inc. (info@skyverge.com)
  *
  * License: GNU General Public License v3.0
  * License URI: http://www.gnu.org/licenses/gpl-3.0.html
  *
- * @package   WC-Sequential-Order-Numbers
  * @author    SkyVerge
- * @category  Plugin
- * @copyright Copyright (c) 2012-2018, SkyVerge, Inc.
+ * @copyright Copyright (c) 2012-2019, SkyVerge, Inc.
  * @license   http://www.gnu.org/licenses/gpl-3.0.html GNU General Public License v3.0
  *
- * WC requires at least: 2.6.14
- * WC tested up to: 3.4.3
+ * WC requires at least: 3.0.9
+ * WC tested up to: 3.7.0
  */
 
 defined( 'ABSPATH' ) or exit;
@@ -35,10 +33,10 @@ class WC_Seq_Order_Number {
 
 
 	/** version number */
-	const VERSION = '1.8.3';
+	const VERSION = '1.9.0-dev.1';
 
 	/** minimum required wc version */
-	const MINIMUM_WC_VERSION = '2.6.14';
+	const MINIMUM_WC_VERSION = '3.0.9';
 
 	/** @var \WC_Seq_Order_Number single instance of this plugin */
 	protected static $instance;
@@ -177,12 +175,12 @@ class WC_Seq_Order_Number {
 			return 0;
 		}
 
-		if ( self::get_order_meta( $order, '_order_number' ) ) {
-			// _order_number was set, so this is not an old order, it's a new one that just happened to have post_id that matched the searched-for order_number
+		// _order_number was set, so this is not an old order, it's a new one that just happened to have post_id that matched the searched-for order_number
+		if ( $order->get_meta( '_order_number', true, 'edit' ) ) {
 			return 0;
 		}
 
-		return self::get_order_prop( $order, 'id' );
+		return $order->get_id();
 	}
 
 
@@ -198,7 +196,7 @@ class WC_Seq_Order_Number {
 		if ( 'shop_order' === $post->post_type && 'auto-draft' !== $post->post_status ) {
 
 			$order        = wc_get_order( $post_id );
-			$order_number = self::get_order_meta( $order, '_order_number' );
+			$order_number = $order->get_meta( '_order_number', true, 'edit' );
 
 			if ( '' === $order_number ) {
 
@@ -227,13 +225,13 @@ class WC_Seq_Order_Number {
 	 * for display.
 	 *
 	 * @param string $order_number the order id with a leading hash
-	 * @param WC_Order $order the order object
+	 * @param \WC_Order $order the order object
 	 * @return string custom order number
 	 */
 	public function get_order_number( $order_number, $order ) {
 
-		if ( self::get_order_meta( $order, '_order_number' ) ) {
-			$order_number = self::get_order_meta( $order, '_order_number' );
+		if ( $sequential_order_number = $order->get_meta( '_order_number', true, 'edit' ) ) {
+			$order_number = $sequential_order_number;
 		}
 
 		return $order_number;
@@ -301,22 +299,22 @@ class WC_Seq_Order_Number {
 
 
 	/**
-	 * Sets an order number on a subscriptions-created order
+	 * Sets an order number on a subscriptions-created order.
 	 *
 	 * @since 1.3
+	 *
 	 * @param \WC_Order $renewal_order the new renewal order object
-	 * @param  \WC_Subscription $subscription Post ID of a 'shop_subscription' post, or instance of a WC_Subscription object
+	 * @param \WC_Subscription $subscription Post ID of a 'shop_subscription' post, or instance of a WC_Subscription object
 	 * @return \WC_Order renewal order instance
 	 */
 	public function subscriptions_set_sequential_order_number( $renewal_order, $subscription ) {
 
-		// sanity check
-		if ( ! $renewal_order instanceof WC_Order ) {
-			return $renewal_order;
-		}
+		if ( $renewal_order instanceof WC_Order ) {
 
-		$order_post = get_post( self::get_order_prop( $renewal_order, 'id' ) );
-		$this->set_sequential_order_number( $order_post->ID, $order_post );
+			$order_post = get_post( $renewal_order->get_id() );
+
+			$this->set_sequential_order_number( $order_post->ID, $order_post );
+		}
 
 		// after Subs 2.0 this callback needs to return the renewal order
 		return $renewal_order;
@@ -371,11 +369,11 @@ class WC_Seq_Order_Number {
 			);
 
 			$args['post__in'] = empty( $order_ids ) ? array( 0 ) : $order_ids;
-	
+
 			// Remove the 'number' parameter to short circuit WooCommerce Admin's handling.
 			unset( $request['number'] );
 		}
-	
+
 		return $args;
 	}
 
@@ -390,25 +388,12 @@ class WC_Seq_Order_Number {
 	 * @return \WC_Seq_Order_Number
 	 */
 	public static function instance() {
-		if ( is_null( self::$instance ) ) {
+
+		if ( null === self::$instance )  {
 			self::$instance = new self();
 		}
+
 		return self::$instance;
-	}
-
-
-	/**
-	 * Checks if WooCommerce is active
-	 *
-	 * @since 1.3
-	 * @deprecated 1.8.3
-	 *
-	 * @return bool true if WooCommerce is active, false otherwise
-	 */
-	public static function is_woocommerce_active() {
-
-		_deprecated_function( 'WC_Seq_Order_Number::is_woocommerce_active', '1.8.3', 'WC_Seq_Order_Number::is_plugin_active' );
-		return self::is_plugin_active( 'woocommerce.php' );
 	}
 
 
@@ -450,67 +435,6 @@ class WC_Seq_Order_Number {
 	}
 
 
-	/**
-	 * Helper method to get order properties pre and post WC 3.0.
-	 *
-	 * TODO: Remove this when WooCommerce 3.0+ is required and remove helpers {BR 2017-03-08}
-	 *
-	 * @param \WC_Order $order the order for which to get data
-	 * @param string $prop the order property to get
-	 * @param string $context the context for the property, 'edit' or 'view'
-	 * @return mixed the order property
-	 */
-	protected static function get_order_prop( $order, $prop, $context = 'edit' ) {
-
-		$value = '';
-
-		if ( self::is_wc_version_gte_3_0() ) {
-
-			if ( is_callable( array( $order, "get_{$prop}" ) ) ) {
-				$value = $order->{"get_{$prop}"}( $context );
-			}
-
-		} else {
-
-			// if this is the 'view' context and there is an accessor method, use it
-			if ( is_callable( array( $order, "get_{$prop}" ) ) && 'view' === $context ) {
-				$value = $order->{"get_{$prop}"}();
-			} else {
-				$value = $order->$prop;
-			}
-		}
-
-		return $value;
-	}
-
-
-	/**
-	 * Helper method to get order meta pre and post WC 3.0.
-	 *
-	 * TODO: Remove this when WooCommerce 3.0+ is required and remove helpers {BR 2017-03-08}
-	 *
-	 * @param \WC_Order $order the order object
-	 * @param string $key the meta key
-	 * @param bool $single whether to get the meta as a single item. Defaults to `true`
-	 * @param string $context if 'view' then the value will be filtered
-	 * @return mixed the order property
-	 */
-	protected static function get_order_meta( $order, $key = '', $single = true, $context = 'edit' ) {
-
-		if (  self::is_wc_version_gte_3_0() ) {
-
-			$value = $order->get_meta( $key, $single, $context );
-
-		} else {
-
-			$order_id = is_callable( array( $order, 'get_id' ) ) ? $order->get_id() : $order->id;
-			$value    = get_post_meta( $order_id, $key, $single );
-		}
-
-		return $value;
-	}
-
-
 	/** Compatibility Methods ******************************************************/
 
 
@@ -522,17 +446,6 @@ class WC_Seq_Order_Number {
 	 */
 	private static function get_wc_version() {
 		return defined( 'WC_VERSION' ) && WC_VERSION ? WC_VERSION : null;
-	}
-
-
-	/**
-	 * Returns true if the installed version of WooCommerce is 3.0 or greater
-	 *
-	 * @since 1.8.0
-	 * @return boolean true if the installed version of WooCommerce is 3.0 or greater
-	 */
-	private static function is_wc_version_gte_3_0() {
-		return self::get_wc_version() && version_compare( self::get_wc_version(), '3.0', '>=' );
 	}
 
 
@@ -648,9 +561,11 @@ class WC_Seq_Order_Number {
 
 
 	/**
-	 * Run when plugin version number changes
+	 * Runs when plugin version number changes.
 	 *
 	 * 1.0.0
+	 *
+	 * @param string $installed_version
 	 */
 	private function upgrade( $installed_version ) {
 		// upgrade code goes here
