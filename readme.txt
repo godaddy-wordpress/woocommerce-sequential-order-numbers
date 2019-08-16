@@ -101,7 +101,7 @@ $order_number = $order->get_order_number();
 
 == Changelog ==
 
-= 2019.08.13 - version 1.9.0-dev.1 =
+= 2019.nn.nn - version 1.9.0-dev.1 =
 * Misc - Add support for WooCommerce 3.7
 * Misc - Remove support for WooCommerce 2.6
 
