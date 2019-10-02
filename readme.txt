@@ -101,6 +101,9 @@ $order_number = $order->get_order_number();
 
 == Changelog ==
 
+= 2019.nn.nn - version 1.9.1-dev.1 =
+ * Fix - Fix order number filter in WooCommerce Admin Downloads Analytics
+
 = 2019.08.15 - version 1.9.0 =
 * Misc - Add support for WooCommerce 3.7
 * Misc - Remove support for WooCommerce 2.6
