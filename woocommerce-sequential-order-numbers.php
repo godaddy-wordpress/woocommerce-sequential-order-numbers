@@ -5,7 +5,7 @@
  * Description: Provides sequential order numbers for WooCommerce orders
  * Author: SkyVerge
  * Author URI: http://www.skyverge.com
- * Version: 1.9.0
+ * Version: 1.9.1-dev.1
  * Text Domain: woocommerce-sequential-order-numbers
  * Domain Path: /i18n/languages/
  *
@@ -33,7 +33,7 @@ class WC_Seq_Order_Number {
 
 
 	/** version number */
-	const VERSION = '1.9.0';
+	const VERSION = '1.9.1-dev.1';
 
 	/** minimum required wc version */
 	const MINIMUM_WC_VERSION = '3.0.9';
@@ -110,7 +110,8 @@ class WC_Seq_Order_Number {
 		add_filter( 'wcs_renewal_order_created',    array( $this, 'subscriptions_set_sequential_order_number' ), 10, 2 );
 
 		// WooCommerce Admin support
-		if ( class_exists( 'WC_Admin_Install', false ) ) {
+		if ( class_exists( 'Automattic\WooCommerce\Admin\Install', false ) ||
+		     class_exists( 'WC_Admin_Install', false ) ) {
 			add_filter( 'woocommerce_rest_orders_prepare_object_query', array( $this, 'wc_admin_order_number_api_param' ), 10, 2 );
 		}
 
