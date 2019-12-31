@@ -101,6 +101,9 @@ $order_number = $order->get_order_number();
 
 == Changelog ==
 
+= 2020.nn.nn - version 1.9.3-dev.1 =
+ * Misc - Add support for WooCommerce 3.9
+
 = 2019.11.05 - version 1.9.2 =
  * Misc - Add support for WooCommerce 3.8
 
