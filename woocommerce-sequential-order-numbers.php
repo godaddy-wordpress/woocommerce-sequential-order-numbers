@@ -5,17 +5,17 @@
  * Description: Provides sequential order numbers for WooCommerce orders
  * Author: SkyVerge
  * Author URI: http://www.skyverge.com
- * Version: 1.9.2
+ * Version: 1.9.3-dev.1
  * Text Domain: woocommerce-sequential-order-numbers
  * Domain Path: /i18n/languages/
  *
- * Copyright: (c) 2012-2019, SkyVerge, Inc. (info@skyverge.com)
+ * Copyright: (c) 2012-2020, SkyVerge, Inc. (info@skyverge.com)
  *
  * License: GNU General Public License v3.0
  * License URI: http://www.gnu.org/licenses/gpl-3.0.html
  *
  * @author    SkyVerge
- * @copyright Copyright (c) 2012-2019, SkyVerge, Inc.
+ * @copyright Copyright (c) 2012-2020, SkyVerge, Inc. (info@skyverge.com)
  * @license   http://www.gnu.org/licenses/gpl-3.0.html GNU General Public License v3.0
  *
  * WC requires at least: 3.0.9
@@ -33,7 +33,7 @@ class WC_Seq_Order_Number {
 
 
 	/** version number */
-	const VERSION = '1.9.2';
+	const VERSION = '1.9.3-dev.1';
 
 	/** minimum required wc version */
 	const MINIMUM_WC_VERSION = '3.0.9';
