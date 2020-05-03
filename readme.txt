@@ -101,6 +101,8 @@ $order_number = $order->get_order_number();
 
 == Changelog ==
 
+= 2020.nn.nn - version 1.9.5-dev.1 =
+
 = 2020.03.10 - version 1.9.4 =
  * Misc - Add support for WooCommerce 4.0
 
