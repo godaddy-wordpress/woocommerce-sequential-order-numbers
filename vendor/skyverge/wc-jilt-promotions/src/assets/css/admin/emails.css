@@ -1,0 +1,17 @@
+#sv-wc-jilt-emails-install-prompt td p {
+    margin-bottom: 12px;
+}
+
+#sv-wc-jilt-emails-install-prompt .sv-wc-jilt-prompt-install-cta {
+    margin-bottom: 6px;
+    padding: 2px 12px;
+}
+#sv-wc-jilt-emails-install-prompt .sv-wc-jilt-prompt-install-cta .dashicons {
+    vertical-align: middle;
+    line-height: 18px;
+    margin-right: 5px;
+}
+
+#sv-wc-jilt-emails-install-prompt .sv-wc-jilt-prompt-hide-cta {
+    display: block;
+}

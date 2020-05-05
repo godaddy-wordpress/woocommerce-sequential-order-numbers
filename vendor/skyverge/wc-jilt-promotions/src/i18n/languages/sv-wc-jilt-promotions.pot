@@ -1,0 +1,107 @@
+# Copyright (C) 2020 SkyVerge Jilt Promotions
+# This file is distributed under the same license as the SkyVerge Jilt Promotions package.
+msgid ""
+msgstr ""
+"Project-Id-Version: SkyVerge Jilt Promotions\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Poedit-Basepath: ..\n"
+"X-Poedit-KeywordsList: __;_e;_ex:1,2c;_n:1,2;_n_noop:1,2;_nx:1,2,4c;_nx_noop:1,2,3c;_x:1,2c;esc_attr__;esc_attr_e;esc_attr_x:1,2c;esc_html__;esc_html_e;esc_html_x:1,2c\n"
+"X-Poedit-SearchPath-0: .\n"
+"X-Poedit-SearchPathExcluded-0: *.js\n"
+"X-Poedit-SourceCharset: UTF-8\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+#. translators: Placeholders: %1$s - <a> tag, %2$s - </a> tag
+#: src/Admin/Emails.php:175
+msgid "Whoops, looks like there was an error installing Jilt for WooCommerce - please install manually %1$sfrom the Plugins menu%2$s."
+msgstr ""
+
+#: src/Admin/Emails.php:199
+msgid "Jilt for WooCommerce"
+msgstr ""
+
+#: src/Admin/Emails.php:209
+msgid "Jilt for WooCommerce successfully installed"
+msgstr ""
+
+#. translators: Placeholders: %s - install error message
+#: src/Admin/Emails.php:218
+msgid "Could not install Jilt for WooCommerce. %s"
+msgstr ""
+
+#. translators: Placeholders; %1$s - <a> tag, %2$s - </a> tag, %3$s - <a> tag, %4$s - </a> tag, %5$s - <a> tag, %6$s - </a> tag
+#: src/Admin/Emails.php:253
+msgid "Create beautiful automated, transactional, and marketing emails using a drag-and-drop editor with %1$sJilt%2$s. Learn more about free and paid plans in the %3$sdocumentation%4$s. Brought to you by %5$sSkyVerge%6$s."
+msgstr ""
+
+#: src/Admin/Emails.php:270
+msgid "Advanced emails"
+msgstr ""
+
+#: src/Admin/Emails.php:310
+msgid "Customize this email"
+msgstr ""
+
+#: src/Admin/Emails.php:329
+msgid "Enhanced emails with Jilt"
+msgstr ""
+
+#: src/Admin/Emails.php:349
+msgid "This setting is shown because you currently have a SkyVerge plugin active."
+msgstr ""
+
+#: src/Admin/Emails.php:359, src/views/admin/html-install-plugin-modal.php:24
+msgid "Install Jilt"
+msgstr ""
+
+#: src/Admin/Emails.php:360
+msgid "Hide this setting"
+msgstr ""
+
+#. translators: Placeholders: %1$s - <a> tag, %2$s - </a> tag
+#: src/Admin/Emails.php:486
+msgid "Personalize your receipts using a drag-and-drop editor with %1$sJilt%2$s. Send different versions of your receipt based on customer or order details (change it for international orders!), cross-sell other products, include a dynamic coupon for the next order, and more."
+msgstr ""
+
+#. translators: Placeholders: %1$s - <a> tag, %2$s - </a> tag
+#: src/Admin/Emails.php:496
+msgid "Personalize your shipment notifications using a drag-and-drop editor with %1$sJilt%2$s. Send beautiful transactional emails, change customer messaging, cross-sell other products, include a dynamic coupon for the next order, and more."
+msgstr ""
+
+#. translators: Placeholders: %1$s - <a> tag, %2$s - </a> tag
+#: src/Admin/Emails.php:506
+msgid "Save the sale! Create beautiful, personalized transactional emails using a drag-and-drop editor with %1$sJilt%2$s. Show refund details, sell related products, or include a discount for the next order."
+msgstr ""
+
+#. translators: Placeholders: %1$s - <a> tag, %2$s - </a> tag
+#: src/Admin/Emails.php:521
+msgid "Keep your subscribers in the loop: create personalized, automated emails using a drag-and-drop editor with %1$sJilt%2$s. Send welcome or winback series, pre-renewal notifications, subscriber newsletters, and more."
+msgstr ""
+
+#. translators: Placeholders: %1$s - <a> tag, %2$s - </a> tag
+#: src/Admin/Emails.php:534
+msgid "Brought to you by %1$sSkyVerge%2$s."
+msgstr ""
+
+#. translators: Placeholders: %1$s - <a> tag, %2$s - </a> tag
+#: src/Admin/Emails.php:561
+msgid "Create beautiful automated and transactional emails using a drag-and-drop editor with %1$sJilt%2$s. Personalize email content with customer and order details — include cross-sells, remind customers to complete payment, or easily share vital order information."
+msgstr ""
+
+#: src/views/admin/html-install-plugin-modal.php:26
+msgid "Close modal panel"
+msgstr ""
+
+#: src/views/admin/html-install-plugin-modal.php:29
+msgid "Click \"install\" to automatically install Jilt for WooCommerce and activate the plugin. You can then connect to Jilt with one click!"
+msgstr ""
+
+#: src/views/admin/html-install-plugin-modal.php:32
+msgid "Cancel"
+msgstr ""
+
+#: src/views/admin/html-install-plugin-modal.php:33
+msgid "Install"
+msgstr ""

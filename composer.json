@@ -1,0 +1,11 @@
+{
+  "repositories": [
+    {
+      "type": "vcs",
+      "url": "https://github.com/skyverge/wc-jilt-promotions"
+    }
+  ],
+  "require": {
+    "skyverge/wc-jilt-promotions": "1.0.*"
+  }
+}

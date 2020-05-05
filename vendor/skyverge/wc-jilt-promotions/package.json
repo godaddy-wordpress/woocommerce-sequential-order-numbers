@@ -1,0 +1,18 @@
+{
+  "name": "skyverge-wc-jilt-promotions",
+  "author": "SkyVerge",
+  "homepage": "https://skyverge.com",
+  "license": "GPL-3.0",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/skyverge/wc-jilt-promotions.git"
+  },
+  "bugs": {
+    "url": "https://github.com/skyverge/wc-jilt-promotions/issues?state=open"
+  },
+  "devDependencies": {
+    "gulp": "^4.0.2",
+    "gulp-minify": "^3.1.0",
+    "gulp-wp-pot": "^2.4.2"
+  }
+}
