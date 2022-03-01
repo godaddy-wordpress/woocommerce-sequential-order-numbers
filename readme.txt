@@ -1,7 +1,7 @@
 === WooCommerce Sequential Order Numbers ===
 Contributors: SkyVerge, maxrice, tamarazuk, chasewiseman, nekojira, beka.rice
 Tags: woocommerce, order number, sequential order number, woocommerce orders
-Requires at least: 4.4
+Requires at least: 4.7
 Tested up to: 5.4.1
 Stable tag: 1.9.6-dev.1
 
