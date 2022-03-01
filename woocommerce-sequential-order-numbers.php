@@ -125,7 +125,7 @@ class WC_Seq_Order_Number {
 		}
 
 		// Installation
-		if ( is_admin() && ! is_ajax() ) {
+		if ( is_admin() && ! wp_doing_ajax() ) {
 			$this->install();
 		}
 	}
@@ -463,7 +463,7 @@ class WC_Seq_Order_Number {
 		// if a plugin defines a minimum WC version, render a notice and skip loading the plugin
 		if ( defined( 'self::MINIMUM_WC_VERSION' ) && version_compare( self::get_wc_version(), self::MINIMUM_WC_VERSION, '<' ) ) {
 
-			if ( is_admin() && ! is_ajax() && ! has_action( 'admin_notices', array( $this, 'render_update_notices' ) ) ) {
+			if ( is_admin() && ! wp_doing_ajax() && ! has_action( 'admin_notices', array( $this, 'render_update_notices' ) ) ) {
 
 				add_action( 'admin_notices', array( $this, 'render_update_notices' ) );
 			}

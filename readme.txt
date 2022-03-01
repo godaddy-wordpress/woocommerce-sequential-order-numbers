@@ -103,6 +103,7 @@ $order_number = $order->get_order_number();
 
 = 2022.nn.nn - version 1.9.6-dev.1 =
  * Misc - Require WooCommerce 3.9.4 or newer
+ * Misc - Replace calls to deprecated `is_ajax()` with `wp_doing_ajax()`
 
 = 2020.05.07 - version 1.9.5 =
  * Misc - Add support for WooCommerce 4.1
