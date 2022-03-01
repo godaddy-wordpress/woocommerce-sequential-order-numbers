@@ -5,20 +5,20 @@
  * Description: Provides sequential order numbers for WooCommerce orders
  * Author: SkyVerge
  * Author URI: http://www.skyverge.com
- * Version: 1.9.5
+ * Version: 1.9.6-dev.1
  * Text Domain: woocommerce-sequential-order-numbers
  * Domain Path: /i18n/languages/
  *
- * Copyright: (c) 2012-2020, SkyVerge, Inc. (info@skyverge.com)
+ * Copyright: (c) 2012-2022, SkyVerge, Inc. (info@skyverge.com)
  *
  * License: GNU General Public License v3.0
  * License URI: http://www.gnu.org/licenses/gpl-3.0.html
  *
  * @author    SkyVerge
- * @copyright Copyright (c) 2012-2020, SkyVerge, Inc. (info@skyverge.com)
+ * @copyright Copyright (c) 2012-2022, SkyVerge, Inc. (info@skyverge.com)
  * @license   http://www.gnu.org/licenses/gpl-3.0.html GNU General Public License v3.0
  *
- * WC requires at least: 3.0.9
+ * WC requires at least: 3.9.4
  * WC tested up to: 4.1.0
  */
 
@@ -33,10 +33,10 @@ class WC_Seq_Order_Number {
 
 
 	/** version number */
-	const VERSION = '1.9.5';
+	const VERSION = '1.9.6-dev.1';
 
 	/** minimum required wc version */
-	const MINIMUM_WC_VERSION = '3.0.9';
+	const MINIMUM_WC_VERSION = '3.9.4';
 
 	/** @var \WC_Seq_Order_Number single instance of this plugin */
 	protected static $instance;
@@ -125,7 +125,7 @@ class WC_Seq_Order_Number {
 		}
 
 		// Installation
-		if ( is_admin() && ! is_ajax() ) {
+		if ( is_admin() && ! wp_doing_ajax() ) {
 			$this->install();
 		}
 	}
@@ -463,7 +463,7 @@ class WC_Seq_Order_Number {
 		// if a plugin defines a minimum WC version, render a notice and skip loading the plugin
 		if ( defined( 'self::MINIMUM_WC_VERSION' ) && version_compare( self::get_wc_version(), self::MINIMUM_WC_VERSION, '<' ) ) {
 
-			if ( is_admin() && ! is_ajax() && ! has_action( 'admin_notices', array( $this, 'render_update_notices' ) ) ) {
+			if ( is_admin() && ! wp_doing_ajax() && ! has_action( 'admin_notices', array( $this, 'render_update_notices' ) ) ) {
 
 				add_action( 'admin_notices', array( $this, 'render_update_notices' ) );
 			}
