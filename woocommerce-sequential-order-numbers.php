@@ -1,11 +1,11 @@
 <?php
 /**
- * Plugin Name: WooCommerce Sequential Order Numbers
+ * Plugin Name: Sequential Order Numbers for WooCommerce
  * Plugin URI: http://www.skyverge.com/blog/woocommerce-sequential-order-numbers/
  * Description: Provides sequential order numbers for WooCommerce orders
  * Author: SkyVerge
  * Author URI: http://www.skyverge.com
- * Version: 1.9.6
+ * Version: 1.9.7-dev.1
  * Text Domain: woocommerce-sequential-order-numbers
  * Domain Path: /i18n/languages/
  *
@@ -33,7 +33,7 @@ class WC_Seq_Order_Number {
 
 
 	/** version number */
-	const VERSION = '1.9.6';
+	const VERSION = '1.9.7-dev.1';
 
 	/** minimum required wc version */
 	const MINIMUM_WC_VERSION = '3.9.4';
@@ -65,7 +65,7 @@ class WC_Seq_Order_Number {
 	public function __clone() {
 
 		/* translators: Placeholders: %s - plugin name */
-		_doing_it_wrong( __FUNCTION__, sprintf( esc_html__( 'You cannot clone instances of %s.', 'woocommerce-sequential-order-numbers' ), 'WooCommerce Sequential Order Numbers' ), '1.7.0' );
+		_doing_it_wrong( __FUNCTION__, sprintf( esc_html__( 'You cannot clone instances of %s.', 'woocommerce-sequential-order-numbers' ), 'Sequential Order Numbers for WooCommerce' ), '1.7.0' );
 	}
 
 
@@ -77,7 +77,7 @@ class WC_Seq_Order_Number {
 	public function __wakeup() {
 
 		/* translators: Placeholders: %s - plugin name */
-		_doing_it_wrong( __FUNCTION__, sprintf( esc_html__( 'You cannot unserialize instances of %s.', 'woocommerce-sequential-order-numbers' ), 'WooCommerce Sequential Order Numbers' ), '1.7.0' );
+		_doing_it_wrong( __FUNCTION__, sprintf( esc_html__( 'You cannot unserialize instances of %s.', 'woocommerce-sequential-order-numbers' ), 'Sequential Order Numbers for WooCommerce' ), '1.7.0' );
 	}
 
 
@@ -526,7 +526,7 @@ class WC_Seq_Order_Number {
 					deactivate_plugins( 'woocommerce-sequential-order-numbers/woocommerce-sequential-order-numbers.php' );  // hardcode the plugin path so that we can use symlinks in development
 
 					// Translators: %s - error message(s)
-					wp_die( sprintf( __( 'Error activating and installing <strong>WooCommerce Sequential Order Numbers</strong>: %s', 'woocommerce-sequential-order-numbers' ), '<ul><li>' . implode( '</li><li>', $order_ids->get_error_messages() ) . '</li></ul>' ) .
+					wp_die( sprintf( __( 'Error activating and installing <strong>Sequential Order Numbers for WooCommerce</strong>: %s', 'woocommerce-sequential-order-numbers' ), '<ul><li>' . implode( '</li><li>', $order_ids->get_error_messages() ) . '</li></ul>' ) .
 					        '<a href="' . admin_url( 'plugins.php' ) . '">' . __( '&laquo; Go Back', 'woocommerce-sequential-order-numbers' ) . '</a>' );
 				}
 

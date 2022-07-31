@@ -1,9 +1,9 @@
-=== WooCommerce Sequential Order Numbers ===
+=== Sequential Order Numbers for WooCommerce ===
 Contributors: SkyVerge, maxrice, tamarazuk, chasewiseman, nekojira, beka.rice
 Tags: woocommerce, order number, sequential order number, woocommerce orders
 Requires at least: 4.7
 Tested up to: 5.9.1
-Stable tag: 1.9.6
+Stable tag: 1.9.7-dev.1
 
 This plugin extends WooCommerce by setting sequential order numbers for new orders.
 
@@ -25,7 +25,7 @@ We do support our free plugins and extensions, but please understand that suppor
 
 = Sequential Order Numbers Pro =
 
-If you like this plugin, but are looking for the ability to set the starting number, or to add a custom prefix/suffix to your order numbers (ie, you'd prefer something like WT101UK, WT102UK, etc) please consider our premium WooCommerce Sequential Order Numbers Pro plugin, which is available in the [WooCommerce Store](http://woocommerce.com/products/sequential-order-numbers-pro/).
+If you like this plugin, but are looking for the ability to set the starting number, or to add a custom prefix/suffix to your order numbers (ie, you'd prefer something like WT101UK, WT102UK, etc) please consider our premium Sequential Order Numbers Pro for WooCommerce plugin, which is available in the [WooCommerce Store](http://woocommerce.com/products/sequential-order-numbers-pro/).
 
 = More Details =
  - See the [product page](http://www.skyverge.com/product/woocommerce-sequential-order-numbers/) for full details.
@@ -41,7 +41,7 @@ You can install the plugin in a few ways:
 
 1. Upload the entire 'woocommerce-sequential-order-numbers' folder to the '/wp-content/plugins/' directory
 2. Upload the zip file you download via Plugins &gt; Add New
-3. Go to Plugins &gt; Add New and search for "WooCommerce Sequential Order Numbers", and install the one from SkyVerge.
+3. Go to Plugins &gt; Add New and search for "Sequential Order Numbers for WooCommerce", and install the one from SkyVerge.
 
 Once you've installed the plugin, to get started please:
 
@@ -62,7 +62,7 @@ If your extension is not displaying the correct order number, you can try contac
 
 = Can I start the order numbers at a particular number? =
 
-This free version does not have that functionality, but the premium [WooCommerce Sequential Order Numbers Pro](http://www.woothemes.com/products/sequential-order-numbers-pro/) will allow you to choose any starting number that's higher than your most current order number.
+This free version does not have that functionality, but the premium [Sequential Order Numbers Pro for WooCommerce](http://www.woothemes.com/products/sequential-order-numbers-pro/) will allow you to choose any starting number that's higher than your most current order number.
 
 = Can I start the order numbers at "1"? =
 
@@ -70,7 +70,7 @@ If you want to begin numbering at "1", you must trash, then permanently delete a
 
 = Can I set an order number prefix/suffix? =
 
-This free version does not have that functionality, but it's included in the premium [WooCommerce Sequential Order Numbers Pro](http://www.woothemes.com/products/sequential-order-numbers-pro/).
+This free version does not have that functionality, but it's included in the premium [Sequential Order Numbers Pro for WooCommerce](http://www.woothemes.com/products/sequential-order-numbers-pro/).
 
 == Other Notes ==
 
@@ -100,6 +100,9 @@ $order_number = $order->get_order_number();
 `
 
 == Changelog ==
+
+= 2022.nn.nn - version 1.9.7-dev.1 =
+ * Misc - Rename to Sequential Order Numbers for WooCommerce
 
 = 2022.03.01 - version 1.9.6 =
  * Misc - Require WooCommerce 3.9.4 or newer
