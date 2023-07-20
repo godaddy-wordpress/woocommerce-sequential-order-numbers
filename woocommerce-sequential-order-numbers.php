@@ -185,6 +185,8 @@ class WC_Seq_Order_Number {
 	/**
 	 * Search for an order with order_number $order_number
 	 *
+	 * @internal
+	 *
 	 * @since 1.0.0
 	 *
 	 * @param string $order_number order number to search for
@@ -240,6 +242,8 @@ class WC_Seq_Order_Number {
 
 	/**
 	 * Set the _order_number field for the newly created order
+	 *
+	 * @internal
 	 *
 	 * @since 1.0.0
 	 *
@@ -334,7 +338,9 @@ class WC_Seq_Order_Number {
 
 
 	/**
-	 * Admin order table orderby ID operates on our meta _order_number
+	 * Admin order table orderby ID operates on our meta `_order_number`.
+	 *
+	 * @internal
 	 *
 	 * @param array $vars associative array of orderby parameteres
 	 * @return array associative array of orderby parameteres
@@ -351,9 +357,12 @@ class WC_Seq_Order_Number {
 
 
 	/**
-	 * Mofifies the given $args argument to sort on our meta integral _order_number
+	 * Modifies the given $args argument to sort on our` _order_number` meta.
+	 *
+	 * @internal
 	 *
 	 * @since 1.3
+	 *
 	 * @param array $args associative array of orderby parameteres
 	 * @return array associative array of orderby parameteres
 	 */
@@ -373,8 +382,11 @@ class WC_Seq_Order_Number {
 
 
 	/**
-	 * Add our custom _order_number to the set of search fields so that
-	 * the admin search functionality is maintained
+	 * Add our custom `_order_number` to the set of search fields so that the admin search functionality is maintained.
+	 *
+	 * @internal
+	 *
+	 * @since 1.0.0
 	 *
 	 * @param array $search_fields array of post meta fields to search by
 	 * @return array of post meta fields to search by
