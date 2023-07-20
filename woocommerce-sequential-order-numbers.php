@@ -131,10 +131,12 @@ class WC_Seq_Order_Number {
 			return;
 		}
 
-		// Set the custom order number on the new order.  we hook into wp_insert_post for orders which are created
-		// from the frontend, and we hook into woocommerce_process_shop_order_meta for admin-created orders
-		add_action( 'wp_insert_post', array( $this, 'set_sequential_order_number' ), 10, 2 );
-		add_action( 'woocommerce_process_shop_order_meta', array( $this, 'set_sequential_order_number' ), 10, 2 );
+		// Set the custom order number on the new order.
+		// We hook into 'woocommerce_checkout_update_order_meta' for orders which are created from the frontend, and we hook into 'woocommerce_process_shop_order_meta' for admin-created orders.
+		// Note we use these actions rather than the more generic 'wp_insert_post' action because we want to run after the order meta (including totals) are set, so we can detect whether this is a free order.
+		add_action( 'woocommerce_checkout_update_order_meta', [ $this, 'set_sequential_order_number' ], 10, 2 );
+		add_action( 'woocommerce_process_shop_order_meta',    [ $this, 'set_sequential_order_number' ], 35, 2 );
+		add_action( 'woocommerce_before_resend_order_emails', [ $this, 'set_sequential_order_number' ], 10, 1 );
 
 		// return our custom order number for display
 		add_filter( 'woocommerce_order_number', array( $this, 'get_order_number' ), 10, 2 );
