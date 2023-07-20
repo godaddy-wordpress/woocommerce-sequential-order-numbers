@@ -52,9 +52,8 @@ class WC_Seq_Order_Number {
 	 */
 	public function __construct() {
 
-		add_action( 'plugins_loaded', array( $this, 'initialize' ) );
-		add_action( 'init',           array( $this, 'load_translation' ) );
-
+		add_action( 'plugins_loaded', [ $this, 'initialize' ] );
+		add_action( 'init',           [ $this, 'load_translation' ] );
 
 		// handle HPOS compatibility
 		add_action( 'before_woocommerce_init', [ $this, 'handle_hpos_compatibility' ] );
