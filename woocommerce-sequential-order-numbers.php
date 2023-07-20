@@ -116,8 +116,11 @@ class WC_Seq_Order_Number {
 
 
 	/**
-	 * Initialize the plugin, bailing if any required conditions are not met,
-	 * including minimum WooCommerce version
+	 * Initialize the plugin.
+	 *
+	 * Prevents loading if any required conditions are not met, including minimum WooCommerce version.
+	 *
+	 * @internal
 	 *
 	 * @since 1.3.2
 	 */
@@ -166,7 +169,9 @@ class WC_Seq_Order_Number {
 
 
 	/**
-	 * Load Translations
+	 * Loads translations.
+	 *
+	 * @internal
 	 *
 	 * @since 1.3.3
 	 */
@@ -179,6 +184,8 @@ class WC_Seq_Order_Number {
 
 	/**
 	 * Search for an order with order_number $order_number
+	 *
+	 * @since 1.0.0
 	 *
 	 * @param string $order_number order number to search for
 	 * @return int post_id for the order identified by $order_number, or 0
@@ -305,8 +312,9 @@ class WC_Seq_Order_Number {
 
 
 	/**
-	 * Filter to return our _order_number field rather than the post ID,
-	 * for display.
+	 * Filters to return our _order_number field rather than the post ID, for display.
+	 *
+	 * @since 1.0.0
 	 *
 	 * @param string $order_number the order id with a leading hash
 	 * @param \WC_Order $order the order object
@@ -474,10 +482,12 @@ class WC_Seq_Order_Number {
 
 
 	/**
-	 * Main Sequential Order Numbers Instance, ensures only one instance is/can be loaded
+	 * Main Sequential Order Numbers Instance, ensures only one instance is/can be loaded.
+	 *
+	 * @see wc_sequential_order_numbers()
 	 *
 	 * @since 1.7.0
-	 * @see wc_sequential_order_numbers()
+	 *
 	 * @return \WC_Seq_Order_Number
 	 */
 	public static function instance() {
@@ -532,9 +542,10 @@ class WC_Seq_Order_Number {
 
 
 	/**
-	 * Helper method to get the version of the currently installed WooCommerce
+	 * Helper method to get the version of the currently installed WooCommerce.
 	 *
 	 * @since 1.3.2
+	 *
 	 * @return string woocommerce version number or null
 	 */
 	private static function get_wc_version() {
@@ -543,10 +554,11 @@ class WC_Seq_Order_Number {
 
 
 	/**
-	 * Perform a minimum WooCommerce version check
+	 * Performs a minimum WooCommerce version check.
 	 *
 	 * @since 1.3.2
-	 * @return boolean true if the required version is met, false otherwise
+	 *
+	 * @return bool
 	 */
 	private function minimum_wc_version_met() {
 
@@ -568,7 +580,9 @@ class WC_Seq_Order_Number {
 
 
 	/**
-	 * Render a notice to update WooCommerce if needed
+	 * Renders a notice to update WooCommerce if needed
+	 *
+	 * @internal
 	 *
 	 * @since 1.3.2
 	 */
@@ -672,6 +686,7 @@ class WC_Seq_Order_Number {
  * Returns the One True Instance of Sequential Order Numbers
  *
  * @since 1.7.0
+ *
  * @return \WC_Seq_Order_Number
  */
 function wc_sequential_order_numbers() {
