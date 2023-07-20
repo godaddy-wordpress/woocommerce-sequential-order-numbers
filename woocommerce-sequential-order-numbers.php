@@ -334,22 +334,20 @@ class WC_Seq_Order_Number {
 			// if no order number has been assigned, this will be an empty array
 			if ( $order && empty( $order_number ) ) {
 
-				// attempt the query up to 3 times for a much higher success rate if it fails (due to Deadlock)
-				$success = false;
+				// attempt the query up to 3 times for a much higher success rate if it fails (to avoid deadlocks)
+				$success          = false;
+				$order_id         = $order_id instanceof \WC_Order ? $order_id->get_id() : $order_id;
 				$order_meta_table = $using_hpos ? $wpdb->prefix . 'wc_orders_meta' : $wpdb->postmeta;
-				$order_id_column = $using_hpos ? 'order_id' : 'post_id';
+				$order_id_column  = $using_hpos ? 'order_id' : 'post_id';
 
 				for ( $i = 0; $i < 3 && ! $success; $i++ ) {
 
-					// this seems to me like the safest way to avoid order number clashes
-					$query = $wpdb->prepare( "
+					$success = $wpdb->query( $wpdb->prepare( "
 						INSERT INTO {$order_meta_table} ({$order_id_column}, meta_key, meta_value)
 						SELECT %d, '_order_number', IF( MAX( CAST( meta_value as UNSIGNED ) ) IS NULL, 1, MAX( CAST( meta_value as UNSIGNED ) ) + 1 )
 							FROM {$order_meta_table}
 							WHERE meta_key='_order_number'
-					", $order_id instanceof \WC_Order ? $order_id->get_id() : $order_id );
-
-					$success = $wpdb->query( $query );
+					", (int) $order_id ) );
 				}
 			}
 		}
