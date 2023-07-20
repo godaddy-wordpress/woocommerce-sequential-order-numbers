@@ -446,30 +446,34 @@ class WC_Seq_Order_Number {
 	public function wc_admin_order_number_api_param( $args, $request ) {
 		global $wpdb;
 
-		if (
-			'/wc/v4/orders' === $request->get_route() &&
-			isset( $request['number'] )
-		) {
+		if ( '/wc/v4/orders' === $request->get_route() && isset( $request['number'] ) ) {
+
 			// Handles 'number' value here and modify $args.
 			$number_search = trim( $request['number'] );
 			$order_sql     = esc_sql( $args['order'] ); // Order defaults to DESC.
 			$limit         = intval( $args['posts_per_page'] ); // Posts per page defaults to 10.
 
+			$using_hpos = $this->is_hpos_enabled();
+			$order_meta_table = $using_hpos ? $wpdb->prefix . 'wc_orders_meta' : $wpdb->postmeta;
+			$order_id_column = $using_hpos ? 'order_id' : 'post_id';
+
 			// Search Order number meta value instead of Post ID.
 			$order_ids = $wpdb->get_col(
-				$wpdb->prepare(
-					"SELECT post_id
-					FROM {$wpdb->prefix}postmeta
+				$wpdb->prepare( "
+					SELECT {$order_id_column}
+					FROM {$order_meta_table}
 					WHERE meta_key = '_order_number'
 					AND meta_value LIKE %s
-					ORDER BY post_id {$order_sql}
-					LIMIT %d",
-					$wpdb->esc_like( $number_search ) . '%',
-					$limit
-				)
+					ORDER BY {$order_id_column} {$order_sql}
+					LIMIT %d
+				", $wpdb->esc_like( $number_search ) . '%', $limit )
 			);
 
-			$args['post__in'] = empty( $order_ids ) ? array( 0 ) : $order_ids;
+			if ( $using_hpos ) {
+				$args['order__in'] = empty( $order_ids ) ? array( 0 ) : $order_ids;
+			} else {
+				$args['post__in'] = empty( $order_ids ) ? array( 0 ) : $order_ids;
+			}
 
 			// Remove the 'number' parameter to short circuit WooCommerce Admin's handling.
 			unset( $request['number'] );
