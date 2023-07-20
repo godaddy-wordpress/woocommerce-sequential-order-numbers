@@ -187,24 +187,17 @@ class WC_Seq_Order_Number {
 
 		// search for the order by custom order number
 		if ( $this->is_hpos_enabled() ) {
-
 			$orders = wc_get_orders([
-				'limit'      => 1,
-				'paginate'   => false,
 				'return'     => 'ids',
+				'limit'      => 1,
 				'meta_query' => [
 					[
 						'key'        => '_order_number',
 						'value'      => $order_number,
-						'comparison' => '=='
 					],
 				],
 			]);
-
-			$order_id = $orders ? current($orders) : null;
-
 		} else {
-
 			$orders = get_posts( [
 				'numberposts' => 1,
 				'meta_key'    => '_order_number',
@@ -213,9 +206,9 @@ class WC_Seq_Order_Number {
 				'post_status' => 'any',
 				'fields'      => 'ids',
 			] );
-
-			list( $order_id ) = ! empty( $orders ) ? $orders : null;
 		}
+
+		$order_id = $orders ? current($orders) : null;
 
 		// order was found
 		if ( $order_id !== null ) {
@@ -241,31 +234,68 @@ class WC_Seq_Order_Number {
 	/**
 	 * Set the _order_number field for the newly created order
 	 *
-	 * @param int $post_id post identifier
-	 * @param \WP_Post $post post object
+	 * @since 1.0.0
+	 *
+	 * @param int|\WC_Order $order_id order identifier or order object
+	 * @param \WP_Post|\WC_Order|null $object order or post object (depending on whether HPOS is in use or not)
 	 */
-	public function set_sequential_order_number( $post_id, $post ) {
+	public function set_sequential_order_number( $order_id, $object ) {
 		global $wpdb;
 
-		if ( 'shop_order' === $post->post_type && 'auto-draft' !== $post->post_status ) {
+		$using_hpos = $this->is_hpos_enabled();
+		$is_order = $order_status = null;
 
-			$order        = wc_get_order( $post_id );
-			$order_number = $order->get_meta( '_order_number', true, 'edit' );
+		if ( $object instanceof \WP_Post ) {
 
-			if ( '' === $order_number ) {
+			$is_order     = $object->post_type === 'shop_order';
+			$order_status = $object->post_status;
+
+		} elseif ( $object instanceof \WC_Order ) {
+
+			$is_order     = true;
+			$order_status = $object->get_status();
+
+		} elseif ( $using_hpos ) {
+
+			$order    = wc_get_order( $order_id ) ?: null;
+			$is_order = $order_status = false;
+
+			if ( $order instanceof \WC_Order ) {
+
+				$is_order     = true;
+				$order_status = $order->get_status();
+
+				if ( $order_status !== 'auto-draft' && isset( $_GET['action'] ) && $_GET['action'] === 'new' ) {
+					$order_status = 'auto-draft';
+				}
+			}
+		}
+
+		// when creating an order from the admin don't create order numbers for auto-draft orders,
+		// because these are not linked to from the admin and so difficult to delete
+		if ( $object === null || ( $is_order && 'auto-draft' !== $order_status ) ) {
+
+			$order        = $order_id instanceof \WC_Order ? $order_id : wc_get_order( $order_id );
+			$order_number = $order ? $order->get_meta( '_order_number' ) : '';
+			$order_id     = $order ? $order->get_id() : 0;
+
+			// if no order number has been assigned, this will be an empty array
+			if ( $order && $order_id && empty( $order_number ) ) {
 
 				// attempt the query up to 3 times for a much higher success rate if it fails (due to Deadlock)
 				$success = false;
+				$order_meta_table = $using_hpos ? $wpdb->prefix . 'wc_orders_meta' : $wpdb->postmeta;
+				$order_id_column = $using_hpos ? 'order_id' : 'post_id';
 
 				for ( $i = 0; $i < 3 && ! $success; $i++ ) {
 
 					// this seems to me like the safest way to avoid order number clashes
 					$query = $wpdb->prepare( "
-						INSERT INTO {$wpdb->postmeta} (post_id, meta_key, meta_value)
+						INSERT INTO {$order_meta_table} ({$order_id_column}, meta_key, meta_value)
 						SELECT %d, '_order_number', IF( MAX( CAST( meta_value as UNSIGNED ) ) IS NULL, 1, MAX( CAST( meta_value as UNSIGNED ) ) + 1 )
-							FROM {$wpdb->postmeta}
-							WHERE meta_key='_order_number'",
-						$post_id );
+							FROM {$order_meta_table}
+							WHERE meta_key='_order_number'
+					", $order_id );
 
 					$success = $wpdb->query( $query );
 				}
