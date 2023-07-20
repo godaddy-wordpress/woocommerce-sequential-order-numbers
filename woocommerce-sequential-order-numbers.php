@@ -395,12 +395,13 @@ class WC_Seq_Order_Number {
 
 		if ( $renewal_order instanceof WC_Order ) {
 
-			$order_post = get_post( $renewal_order->get_id() );
+			$order = wc_get_order( $renewal_order->get_id() );
 
-			$this->set_sequential_order_number( $order_post->ID, $order_post );
+			if ( $order ) {
+				$this->set_sequential_order_number( $order->get_id(), $order );
+			}
 		}
 
-		// after Subs 2.0 this callback needs to return the renewal order
 		return $renewal_order;
 	}
 
