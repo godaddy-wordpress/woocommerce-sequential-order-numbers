@@ -92,6 +92,40 @@ class WC_Seq_Order_Number {
 
 
 	/**
+	 * Determines if the current screen is the orders screen.
+	 *
+	 * @since 1.10.0-dev.1
+	 *
+	 * @return bool
+	 */
+	protected function is_orders_screen() {
+
+		$current_screen = function_exists( 'get_current_screen') ? get_current_screen() : null;
+
+		if ( ! $current_screen ) {
+			return false;
+		}
+
+		$using_hpos = $this->is_hpos_enabled();
+
+		if ( ! $using_hpos ) {
+			return 'edit-shop_order' === $current_screen->id;
+		}
+
+		if ( is_callable( \Automattic\WooCommerce\Utilities\OrderUtil::class . '::get_order_admin_screen' ) ) {
+			$orders_screen_id = \Automattic\WooCommerce\Utilities\OrderUtil::get_order_admin_screen();
+		} else {
+			$orders_screen_id = function_exists( 'wc_get_page_screen_id' ) ? wc_get_page_screen_id( 'shop-order' ) : null;
+		}
+
+		return $orders_screen_id === $current_screen->id
+			&& isset( $_GET['page'] )
+			&& $_GET['page'] === 'wc-orders'
+			&& ! in_array( $_GET['action'], [ 'new', 'edit' ], true );
+	}
+
+
+	/**
 	 * Cloning instances is forbidden due to singleton pattern.
 	 *
 	 * @since 1.7.0
@@ -154,12 +188,20 @@ class WC_Seq_Order_Number {
 		}
 
 		if ( is_admin() ) {
-			add_filter( 'request',                              array( $this, 'woocommerce_custom_shop_order_orderby' ), 20 );
+
+			if ( $this->is_hpos_enabled() ) {
+				/** @see \Automattic\WooCommerce\Internal\Admin\Orders\ListTable::prepare_items() */
+				add_filter( 'woocommerce_shop_order_list_table_request', [ $this, 'woocommerce_custom_shop_order_orderby' ], 20 );
+			} else {
+				add_filter( 'request', [ $this, 'woocommerce_custom_shop_order_orderby' ], 20 );
+			}
+
 			add_filter( 'woocommerce_shop_order_search_fields', array( $this, 'custom_search_fields' ) );
 
 			// sort by underlying _order_number on the Pre-Orders table
 			add_filter( 'wc_pre_orders_edit_pre_orders_request', array( $this, 'custom_orderby' ) );
 			add_filter( 'wc_pre_orders_search_fields',           array( $this, 'custom_search_fields' ) );
+
 		}
 
 		// Installation
@@ -343,13 +385,26 @@ class WC_Seq_Order_Number {
 	 *
 	 * @internal
 	 *
+	 * @since 1.3
+	 *
 	 * @param array $vars associative array of orderby parameteres
 	 * @return array associative array of orderby parameteres
 	 */
 	public function woocommerce_custom_shop_order_orderby( $vars ) {
 		global $typenow;
 
-		if ( 'shop_order' !== $typenow ) {
+		if ( ! is_array( $vars ) ) {
+			return $vars;
+		}
+
+		if ( ! $this->is_hpos_enabled() ) {
+
+			if ( 'shop_order' !== $typenow ) {
+				return $vars;
+			}
+
+		} elseif ( ! $this->is_orders_screen() ) {
+
 			return $vars;
 		}
 
