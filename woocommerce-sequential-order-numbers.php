@@ -121,7 +121,7 @@ class WC_Seq_Order_Number {
 		return $orders_screen_id === $current_screen->id
 			&& isset( $_GET['page'] )
 			&& $_GET['page'] === 'wc-orders'
-			&& ! in_array( $_GET['action'], [ 'new', 'edit' ], true );
+			&& ( ! isset( $_GET['action'] ) || ! in_array( $_GET['action'], [ 'new', 'edit' ], true ) );
 	}
 
 
