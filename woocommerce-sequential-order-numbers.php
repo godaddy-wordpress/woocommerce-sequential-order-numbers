@@ -78,6 +78,20 @@ class WC_Seq_Order_Number {
 
 
 	/**
+	 * Determines whether HPOS is in use.
+	 *
+	 * @since 1.10.0-dev.1
+	 *
+	 * @return bool
+	 */
+	protected function is_hpos_enabled() {
+
+		return class_exists( \Automattic\WooCommerce\Utilities\OrderUtil::class )
+			&& \Automattic\WooCommerce\Utilities\OrderUtil::custom_orders_table_usage_is_enabled();
+	}
+
+
+	/**
 	 * Cloning instances is forbidden due to singleton pattern.
 	 *
 	 * @since 1.7.0
@@ -172,21 +186,40 @@ class WC_Seq_Order_Number {
 	public function find_order_by_order_number( $order_number ) {
 
 		// search for the order by custom order number
-		$query_args = array(
-			'numberposts' => 1,
-			'meta_key'    => '_order_number',
-			'meta_value'  => $order_number,
-			'post_type'   => 'shop_order',
-			'post_status' => 'any',
-			'fields'      => 'ids',
-		);
+		if ( $this->is_hpos_enabled() ) {
 
-		$posts            = get_posts( $query_args );
-		list( $order_id ) = ! empty( $posts ) ? $posts : null;
+			$orders = wc_get_orders([
+				'limit'      => 1,
+				'paginate'   => false,
+				'return'     => 'ids',
+				'meta_query' => [
+					[
+						'key'        => '_order_number',
+						'value'      => $order_number,
+						'comparison' => '=='
+					],
+				],
+			]);
+
+			$order_id = $orders ? current($orders) : null;
+
+		} else {
+
+			$orders = get_posts( [
+				'numberposts' => 1,
+				'meta_key'    => '_order_number',
+				'meta_value'  => $order_number,
+				'post_type'   => 'shop_order',
+				'post_status' => 'any',
+				'fields'      => 'ids',
+			] );
+
+			list( $order_id ) = ! empty( $orders ) ? $orders : null;
+		}
 
 		// order was found
 		if ( $order_id !== null ) {
-			return $order_id;
+			return (int) $order_id;
 		}
 
 		// if we didn't find the order, then it may be that this plugin was disabled and an order was placed in the interim
