@@ -165,12 +165,11 @@ class WC_Seq_Order_Number {
 			return;
 		}
 
-		// Set the custom order number on the new order.
-		// We hook into 'woocommerce_checkout_update_order_meta' for orders which are created from the frontend, and we hook into 'woocommerce_process_shop_order_meta' for admin-created orders.
-		// Note we use these actions rather than the more generic 'wp_insert_post' action because we want to run after the order meta (including totals) are set, so we can detect whether this is a free order.
+		// set the custom order number on the new order
+		add_action( 'wp_insert_post',                         [ $this, 'set_sequential_order_number' ], 10, 2 );
 		add_action( 'woocommerce_checkout_update_order_meta', [ $this, 'set_sequential_order_number' ], 10, 2 );
 		add_action( 'woocommerce_process_shop_order_meta',    [ $this, 'set_sequential_order_number' ], 35, 2 );
-		add_action( 'woocommerce_before_resend_order_emails', [ $this, 'set_sequential_order_number' ], 10, 1 );
+		add_action( 'woocommerce_before_resend_order_emails', [ $this, 'set_sequential_order_number' ] );
 
 		// return our custom order number for display
 		add_filter( 'woocommerce_order_number', array( $this, 'get_order_number' ), 10, 2 );
@@ -331,10 +330,9 @@ class WC_Seq_Order_Number {
 
 			$order        = $order_id instanceof \WC_Order ? $order_id : wc_get_order( $order_id );
 			$order_number = $order ? $order->get_meta( '_order_number' ) : '';
-			$order_id     = $order ? $order->get_id() : 0;
 
 			// if no order number has been assigned, this will be an empty array
-			if ( $order && $order_id && empty( $order_number ) ) {
+			if ( $order && empty( $order_number ) ) {
 
 				// attempt the query up to 3 times for a much higher success rate if it fails (due to Deadlock)
 				$success = false;
@@ -349,7 +347,7 @@ class WC_Seq_Order_Number {
 						SELECT %d, '_order_number', IF( MAX( CAST( meta_value as UNSIGNED ) ) IS NULL, 1, MAX( CAST( meta_value as UNSIGNED ) ) + 1 )
 							FROM {$order_meta_table}
 							WHERE meta_key='_order_number'
-					", $order_id );
+					", $order_id instanceof \WC_Order ? $order_id->get_id() : $order_id );
 
 					$success = $wpdb->query( $query );
 				}
