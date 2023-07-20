@@ -387,13 +387,15 @@ class WC_Seq_Order_Number {
 	 *
 	 * @since 1.3
 	 *
+	 * @internal
+	 *
 	 * @param \WC_Order $renewal_order the new renewal order object
 	 * @param \WC_Subscription $subscription Post ID of a 'shop_subscription' post, or instance of a WC_Subscription object
 	 * @return \WC_Order renewal order instance
 	 */
 	public function subscriptions_set_sequential_order_number( $renewal_order, $subscription ) {
 
-		if ( $renewal_order instanceof WC_Order ) {
+		if ( $renewal_order instanceof \WC_Order ) {
 
 			$order = wc_get_order( $renewal_order->get_id() );
 
@@ -409,11 +411,13 @@ class WC_Seq_Order_Number {
 	/**
 	 * Don't copy over order number meta when creating a parent or child renewal order
 	 *
-	 * Prevents unnecessary order meta from polluting parent renewal orders,
-	 * and set order number for subscription orders
+	 * Prevents unnecessary order meta from polluting parent renewal orders, and set order number for subscription orders.
 	 *
 	 * @since 1.3
-	 * @param array $order_meta_query query for pulling the metadata
+	 *
+	 * @internal
+	 *
+	 * @param string $order_meta_query query for pulling the metadata
 	 * @return string
 	 */
 	public function subscriptions_remove_renewal_order_meta( $order_meta_query ) {
@@ -421,7 +425,11 @@ class WC_Seq_Order_Number {
 	}
 
 	/**
-	 * Hook WooCommerce Admin's order number search to the meta value.
+	 * Hook WooCommerce Admin  order number search to the meta value.
+	 *
+	 * @since 1.3
+	 *
+	 * @internal
 	 *
 	 * @param array $args Arguments to be passed to WC_Order_Query.
 	 * @param WP_REST_Request $request REST API request being made.
