@@ -166,7 +166,9 @@ class WC_Seq_Order_Number {
 		}
 
 		// set the custom order number on the new order
-		add_action( 'wp_insert_post',                         [ $this, 'set_sequential_order_number' ], 10, 2 );
+		if ( ! $this->is_hpos_enabled() ) {
+			add_action( 'wp_insert_post', [ $this, 'set_sequential_order_number' ], 10, 2 );
+		}
 		add_action( 'woocommerce_checkout_update_order_meta', [ $this, 'set_sequential_order_number' ], 10, 2 );
 		add_action( 'woocommerce_process_shop_order_meta',    [ $this, 'set_sequential_order_number' ], 35, 2 );
 		add_action( 'woocommerce_before_resend_order_emails', [ $this, 'set_sequential_order_number' ] );
@@ -699,7 +701,7 @@ class WC_Seq_Order_Number {
 
 					// Translators: %s - error message(s)
 					wp_die( sprintf( __( 'Error activating and installing <strong>Sequential Order Numbers for WooCommerce</strong>: %s', 'woocommerce-sequential-order-numbers' ), '<ul><li>' . implode( '</li><li>', $order_ids->get_error_messages() ) . '</li></ul>' ) .
-					        '<a href="' . admin_url( 'plugins.php' ) . '">' . __( '&laquo; Go Back', 'woocommerce-sequential-order-numbers' ) . '</a>' );
+							'<a href="' . admin_url( 'plugins.php' ) . '">' . __( '&laquo; Go Back', 'woocommerce-sequential-order-numbers' ) . '</a>' );
 				}
 
 
