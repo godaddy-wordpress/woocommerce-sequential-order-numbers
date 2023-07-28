@@ -168,12 +168,14 @@ class WC_Seq_Order_Number {
 		// set the custom order number on the new order
 		if ( ! $this->is_hpos_enabled() ) {
 			add_action( 'wp_insert_post', [ $this, 'set_sequential_order_number' ], 10, 2 );
+		} else {
+			add_action( 'woocommerce_checkout_update_order_meta', [ $this, 'set_sequential_order_number' ], 10, 2 );
+			add_action( 'woocommerce_process_shop_order_meta',    [ $this, 'set_sequential_order_number' ], 35, 2 );
+			add_action( 'woocommerce_before_resend_order_emails', [ $this, 'set_sequential_order_number' ] );
 		}
-		add_action( 'woocommerce_checkout_update_order_meta', [ $this, 'set_sequential_order_number' ], 10, 2 );
-		add_action( 'woocommerce_process_shop_order_meta',    [ $this, 'set_sequential_order_number' ], 35, 2 );
-		add_action( 'woocommerce_before_resend_order_emails', [ $this, 'set_sequential_order_number' ] );
 
-		add_action( 'woocommerce_store_api_checkout_update_order_meta', array( $this, 'set_sequential_order_number' ), 10, 2 );
+		// set the custom order number on WooCommerce Checkout Block submissions
+		add_action( 'woocommerce_store_api_checkout_update_order_meta', [ $this, 'set_sequential_order_number' ], 10, 2 );
 
 		// return our custom order number for display
 		add_filter( 'woocommerce_order_number', array( $this, 'get_order_number' ), 10, 2 );
@@ -352,6 +354,21 @@ class WC_Seq_Order_Number {
 							FROM {$order_meta_table}
 							WHERE meta_key='_order_number'
 					", (int) $order_id ) );
+				}
+
+				// With HPOS we need to trigger a save to update the order number or it won't persist by using the direct query above alone.
+				// This may have the effect of creating 2 identical order number meta entries for an order but this seems to work nonetheless.
+				if ( $success && $using_hpos ) {
+
+					$meta_id_col  = 'id';
+					$order_number = $wpdb->get_var( $wpdb->prepare( "
+						SELECT meta_value
+						FROM {$order_meta_table}
+						WHERE {$meta_id_col} = %d
+					", $wpdb->insert_id ) );
+
+					$order->update_meta_data( '_order_number', $order_number );
+					$order->save();
 				}
 			}
 		}
