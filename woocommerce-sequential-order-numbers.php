@@ -236,7 +236,7 @@ class WC_Seq_Order_Number {
 	 * @since 1.0.0
 	 *
 	 * @param string $order_number order number to search for
-	 * @return int post_id for the order identified by $order_number, or 0
+	 * @return int $order_id for the order identified by $order_number, or 0
 	 */
 	public function find_order_by_order_number( $order_number ) {
 
@@ -277,7 +277,7 @@ class WC_Seq_Order_Number {
 			return 0;
 		}
 
-		// _order_number was set, so this is not an old order, it's a new one that just happened to have post_id that matched the searched-for order_number
+		// _order_number was set, so this is not an old order, it's a new one that just happened to have an order ID that matched the searched-for order_number
 		if ( $order->get_meta( '_order_number', true, 'edit' ) ) {
 			return 0;
 		}
@@ -359,7 +359,7 @@ class WC_Seq_Order_Number {
 
 
 	/**
-	 * Filters to return our _order_number field rather than the post ID, for display.
+	 * Filters to return our _order_number field rather than the order ID, for display.
 	 *
 	 * @since 1.0.0
 	 *
@@ -444,8 +444,8 @@ class WC_Seq_Order_Number {
 	 *
 	 * @since 1.0.0
 	 *
-	 * @param string[] $search_fields array of post meta fields to search by
-	 * @return string[] of post meta fields to search by
+	 * @param string[] $search_fields array of order meta fields to search by
+	 * @return string[] of order meta fields to search by
 	 */
 	public function custom_search_fields( $search_fields ) {
 
@@ -464,7 +464,7 @@ class WC_Seq_Order_Number {
 	 * @internal
 	 *
 	 * @param \WC_Order $renewal_order the new renewal order object
-	 * @param \WC_Subscription $subscription Post ID of a 'shop_subscription' post, or instance of a WC_Subscription object
+	 * @param \WC_Subscription $subscription ID of a 'shop_subscription' object, or instance of a WC_Subscription object
 	 * @return \WC_Order renewal order instance
 	 */
 	public function subscriptions_set_sequential_order_number( $renewal_order, $subscription ) {
@@ -693,45 +693,50 @@ class WC_Seq_Order_Number {
 
 		if ( ! $installed_version ) {
 
-			// initial install, set the order number for all existing orders to the post id:
-			//  page through the "publish" orders in blocks to avoid out of memory errors
-			$offset         = (int) get_option( 'wc_sequential_order_numbers_install_offset', 0 );
-			$posts_per_page = 500;
+			// initial install, set the order number for all existing orders to the order id:
+			// page through the "publish" orders in blocks to avoid out of memory errors
+			$offset          = (int) get_option( 'wc_sequential_order_numbers_install_offset', 0 );
+			$orders_par_page = 500;
 
 			do {
 
-				// initial install, set the order number for all existing orders to the post id
-				$order_ids = get_posts( array( 'post_type' => 'shop_order', 'fields' => 'ids', 'offset' => $offset, 'posts_per_page' => $posts_per_page, 'post_status' => 'any' ) );
+				// initial install, set the order number for all existing orders to the order id
+				$orders = wc_get_orders( [
+					'type'   => 'shop_order',
+					'offset' => $offset,
+					'limit'  => $orders_par_page
+				] );
 
 				// some sort of bad database error: deactivate the plugin and display an error
-				if ( is_wp_error( $order_ids ) ) {
+				if ( is_wp_error( $orders ) ) {
 					require_once ABSPATH . 'wp-admin/includes/plugin.php';
 					deactivate_plugins( 'woocommerce-sequential-order-numbers/woocommerce-sequential-order-numbers.php' );  // hardcode the plugin path so that we can use symlinks in development
 
-					// Translators: %s - error message(s)
-					wp_die( sprintf( __( 'Error activating and installing <strong>Sequential Order Numbers for WooCommerce</strong>: %s', 'woocommerce-sequential-order-numbers' ), '<ul><li>' . implode( '</li><li>', $order_ids->get_error_messages() ) . '</li></ul>' ) .
-							'<a href="' . admin_url( 'plugins.php' ) . '">' . __( '&laquo; Go Back', 'woocommerce-sequential-order-numbers' ) . '</a>' );
-				}
+					wp_die(
+						sprintf(
+							/** translators: Placeholder: %s - error message(s) */
+							__( 'Error activating and installing <strong>Sequential Order Numbers for WooCommerce</strong>: %s', 'woocommerce-sequential-order-numbers' ),
+							'<ul><li>' . implode( '</li><li>', $orders->get_error_messages() ) . '</li></ul>'
+						) . '<a href="' . admin_url( 'plugins.php' ) . '">' . __( '&laquo; Go Back', 'woocommerce-sequential-order-numbers' ) . '</a>'
+					);
 
+				} elseif ( is_array( $orders ) ) {
 
-				if ( is_array( $order_ids ) ) {
+					foreach( $orders as $order ) {
 
-					foreach( $order_ids as $order_id ) {
-
-						// TODO: I'm not changing this right now so I don't have to instantiate a new order object for each update
-						// and if orders move away from posts this plugin doesn't matter anyway {BR 2017-03-08}
-						if ( '' === get_post_meta( $order_id, '_order_number', true ) ) {
-							add_post_meta( $order_id, '_order_number', $order_id );
+						if ( '' === $order->get_meta( '_order_number', true ) ) {
+							$order->add_meta_data('_order_number', (string) $order->get_id() );
+							$order->save_meta_data();
 						}
 					}
 				}
 
 				// increment offset
-				$offset += $posts_per_page;
+				$offset += $orders_par_page;
 				// and keep track of how far we made it in case we hit a script timeout
 				update_option( 'wc_sequential_order_numbers_install_offset', $offset );
 
-			} while ( count( $order_ids ) === $posts_per_page );  // while full set of results returned  (meaning there may be more results still to retrieve)
+			} while ( count( $orders ) === $orders_par_page );  // while full set of results returned  (meaning there may be more results still to retrieve)
 		}
 
 		if ( $installed_version !== WC_Seq_Order_Number::VERSION ) {
