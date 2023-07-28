@@ -369,6 +369,11 @@ class WC_Seq_Order_Number {
 	 */
 	public function get_order_number( $order_number, $order ) {
 
+		// don't display an order number for subscription objects
+		if ( $order instanceof \WC_Subscription ) {
+			return $order_number;
+		}
+
 		if ( $sequential_order_number = $order->get_meta( '_order_number', true, 'edit' ) ) {
 			$order_number = $sequential_order_number;
 		}
