@@ -211,7 +211,7 @@ class WC_Seq_Order_Number {
 
 		// Installation
 		if ( is_admin() && ! wp_doing_ajax() ) {
-			$this->install();
+			add_action( 'admin_init', [ $this, 'install' ] );
 		}
 	}
 
@@ -707,9 +707,11 @@ class WC_Seq_Order_Number {
 	/**
 	 * Run every time.  Used since the activation hook is not executed when updating a plugin
 	 *
+	 * @internal
+	 *
 	 * @since 1.0.0
 	 */
-	private function install() {
+	public function install() {
 
 		$installed_version = get_option( WC_Seq_Order_Number::VERSION_OPTION_NAME );
 
