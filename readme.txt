@@ -103,8 +103,8 @@ $order_number = $order->get_order_number();
 == Changelog ==
 
 - 2023.nn.nn - version 1.10.0-dev.1 =
- * Tweak - Add support for WooCommerce Blocks checkout
  * Misc - Add compatibility for WooCommerce High Performance Order Storage (HPOS)
+ * Misc - Add support for WooCommerce Blocks checkout
  * Misc - Require PHP 7.4 and WordPress 5.6
 
 = 2022.07.30 - version 1.9.7 =
