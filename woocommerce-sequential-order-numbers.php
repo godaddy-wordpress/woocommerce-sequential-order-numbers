@@ -287,7 +287,7 @@ class WC_Seq_Order_Number {
 
 
 	/**
-	 * Set the _order_number field for the newly created order
+	 * Set the `_order_number` field for the newly created order according to HPOS usage.
 	 *
 	 * @internal
 	 *
@@ -296,51 +296,51 @@ class WC_Seq_Order_Number {
 	 * @param int|\WC_Order $order_id order identifier or order object
 	 * @param \WP_Post|\WC_Order|null $object order or post object (depending on whether HPOS is in use or not)
 	 */
-	public function set_sequential_order_number( $order_id, $object ) {
+	public function set_sequential_order_number( $order_id = null, $object = null ) {
 		global $wpdb;
 
 		$using_hpos = $this->is_hpos_enabled();
-		$is_order = $order_status = null;
 
 		if ( $object instanceof \WP_Post ) {
 
-			$is_order     = $object->post_type === 'shop_order';
+			$is_order     = 'shop_order' === $object->post_type;
+			$order        = $is_order ? wc_get_order( $object->ID ) : null;
+			$order_id     = $object->ID;
 			$order_status = $object->post_status;
 
-		} elseif ( $object instanceof \WC_Order ) {
+		} elseif ( null === $object && $order_id ) {
 
-			$is_order     = true;
-			$order_status = $object->get_status();
+			$order        = wc_get_order( $order_id );
+			$is_order     = $order instanceof \WC_Order;
+			$order_status = $order ? $order->get_status() : '';
 
-		} elseif ( $using_hpos ) {
+		} else {
 
-			$order    = wc_get_order( $order_id ) ?: null;
-			$is_order = $order_status = false;
+			$order        = $object instanceof \WC_Order ? $object : wc_get_order( (int) $order_id );
+			$is_order     = $order instanceof \WC_Order;
+			$order_id     = $order ? $order->get_id() : 0;
+			$order_status = $order ? $order->get_status() : '';
 
-			if ( $order instanceof \WC_Order ) {
-
-				$is_order     = true;
-				$order_status = $order->get_status();
-
-				if ( $order_status !== 'auto-draft' && isset( $_GET['action'] ) && $_GET['action'] === 'new' ) {
-					$order_status = 'auto-draft';
-				}
+			if ( $is_order && $order_status !== 'auto-draft' && isset( $_GET['action'] ) && $_GET['action'] === 'new' ) {
+				$order_status = 'auto-draft';
 			}
 		}
 
 		// when creating an order from the admin don't create order numbers for auto-draft orders,
 		// because these are not linked to from the admin and so difficult to delete
-		if ( $object === null || ( $is_order && 'auto-draft' !== $order_status ) ) {
+		if ( $object === null || ( $is_order && ( $using_hpos || 'auto-draft' !== $order_status ) ) ) {
 
-			$order        = $order_id instanceof \WC_Order ? $order_id : wc_get_order( $order_id );
-			$order_number = $order ? $order->get_meta( '_order_number' ) : '';
+			if ( $using_hpos ) {
+				$order_number = $order ? $order->get_meta( '_order_number' ) : '';
+			} else {
+				$order_number = get_post_meta( $order_id, '_order_number', true );
+			}
 
 			// if no order number has been assigned, this will be an empty array
-			if ( $order && empty( $order_number ) ) {
+			if ( empty( $order_number ) ) {
 
 				// attempt the query up to 3 times for a much higher success rate if it fails (to avoid deadlocks)
 				$success          = false;
-				$order_id         = $order_id instanceof \WC_Order ? $order_id->get_id() : $order_id;
 				$order_meta_table = $using_hpos ? $wpdb->prefix . 'wc_orders_meta' : $wpdb->postmeta;
 				$order_id_column  = $using_hpos ? 'order_id' : 'post_id';
 
