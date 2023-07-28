@@ -182,8 +182,8 @@ class WC_Seq_Order_Number {
 		add_filter( 'woocommerce_shortcode_order_tracking_order_id', array( $this, 'find_order_by_order_number' ) );
 
 		// WC Subscriptions support
-		add_filter( 'wcs_renewal_order_meta_query', array( $this, 'subscriptions_remove_renewal_order_meta' ) );
-		add_filter( 'wcs_renewal_order_created',    array( $this, 'subscriptions_set_sequential_order_number' ), 10, 2 );
+		add_filter( 'wc_subscriptions_renewal_order_data', [ $this, 'subscriptions_remove_renewal_order_meta' ] );
+		add_filter( 'wcs_renewal_order_created',           [ $this, 'subscriptions_set_sequential_order_number' ], 10, 2 );
 
 		// WooCommerce Admin support
 		if ( class_exists( 'Automattic\WooCommerce\Admin\Install', false ) || class_exists( 'WC_Admin_Install', false ) ) {
@@ -491,11 +491,18 @@ class WC_Seq_Order_Number {
 	 *
 	 * @internal
 	 *
-	 * @param string $order_meta_query query for pulling the metadata
-	 * @return string
+	 * @param string[]|mixed $order_data
+	 * @return string[]mixed
 	 */
-	public function subscriptions_remove_renewal_order_meta( $order_meta_query ) {
-		return $order_meta_query . " AND meta_key NOT IN ( '_order_number' )";
+	public function subscriptions_remove_renewal_order_meta( $order_data ) {
+
+		if ( ! is_array( $order_data ) ) {
+			return $order_data;
+		}
+
+		unset( $order_data['_order_number'] );
+
+		return $order_data;
 	}
 
 	/**
