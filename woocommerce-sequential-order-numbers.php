@@ -327,7 +327,7 @@ class WC_Seq_Order_Number {
 		}
 
 		// when creating an order from the admin don't create order numbers for auto-draft orders,
-		// because these are not linked to from the admin and so difficult to delete
+		// because these are not linked to from the admin and so difficult to delete when CPT tables are used
 		if ( $object === null || ( $is_order && ( $using_hpos || 'auto-draft' !== $order_status ) ) ) {
 
 			if ( $using_hpos ) {
