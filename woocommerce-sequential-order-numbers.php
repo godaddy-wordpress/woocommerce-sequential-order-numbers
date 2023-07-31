@@ -295,7 +295,7 @@ class WC_Seq_Order_Number {
 	 * @since 1.0.0
 	 *
 	 * @param int|\WC_Order $order_id order identifier or order object
-	 * @param \WP_Post|\WC_Order|array<string, mixed>null $object order or post object or post data (depending on HPOS and hook in use)
+	 * @param \WP_Post|\WC_Order|array<string, mixed>|null $object $object order or post object or post data (depending on HPOS and hook in use)
 	 */
 	public function set_sequential_order_number( $order_id = null, $object = null ) {
 		global $wpdb;
