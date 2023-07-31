@@ -403,8 +403,8 @@ class WC_Seq_Order_Number {
 	 *
 	 * @since 1.3
 	 *
-	 * @param array $vars associative array of orderby parameteres
-	 * @return array associative array of orderby parameteres
+	 * @param array $vars associative array of orderby parameters
+	 * @return array associative array of orderby parameters
 	 */
 	public function woocommerce_custom_shop_order_orderby( $vars ) {
 		global $typenow;
@@ -435,18 +435,18 @@ class WC_Seq_Order_Number {
 	 *
 	 * @since 1.3
 	 *
-	 * @param array $args associative array of orderby parameteres
-	 * @return array associative array of orderby parameteres
+	 * @param array $args associative array of orderby parameters
+	 * @return array associative array of orderby parameters
 	 */
 	public function custom_orderby( $args ) {
 
-		// Sorting
+		// sorting
 		if ( isset( $args['orderby'] ) && 'ID' == $args['orderby'] ) {
 
-			$args = array_merge( $args, array(
+			$args = array_merge( $args, [
 				'meta_key' => '_order_number',  // sort on numerical portion for better results
 				'orderby'  => 'meta_value_num',
-			) );
+			] );
 		}
 
 		return $args;
