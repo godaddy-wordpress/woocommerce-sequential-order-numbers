@@ -314,7 +314,7 @@ class WC_Seq_Order_Number {
 		} else {
 
 			$order        = $object instanceof \WC_Order ? $object : wc_get_order( (int) $order_id );
-			$is_order     = $order instanceof \WC_Order && ! $order instanceof \WC_Subscription;
+			$is_order     = $order instanceof \WC_Order && 'shop_order' === $order->get_type();
 			$order_id     = $order ? $order->get_id() : 0;
 			$order_status = $order ? $order->get_status() : '';
 
