@@ -315,7 +315,7 @@ class WC_Seq_Order_Number {
 
 			$order        = $object instanceof \WC_Order ? $object : wc_get_order( (int) $order_id );
 			$is_order     = $order instanceof \WC_Order && 'shop_order' === $order->get_type();
-			$order_id     = $order ? $order->get_id() : 0;
+			$order_id     = ! $order_id && $order ? $order->get_id() : (int) $order_id;
 			$order_status = $order ? $order->get_status() : '';
 
 			if ( $is_order && $order_status !== 'auto-draft' && isset( $_GET['action'] ) && $_GET['action'] === 'new' ) {
