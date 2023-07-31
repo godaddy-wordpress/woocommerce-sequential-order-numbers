@@ -251,6 +251,7 @@ class WC_Seq_Order_Number {
 					[
 						'key'        => '_order_number',
 						'value'      => $order_number,
+						'comparison' => '='
 					],
 				],
 			]);
