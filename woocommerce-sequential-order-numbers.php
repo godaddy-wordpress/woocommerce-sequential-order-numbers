@@ -197,7 +197,7 @@ class WC_Seq_Order_Number {
 			if ( $this->is_hpos_enabled() ) {
 				/** @see \Automattic\WooCommerce\Internal\Admin\Orders\ListTable::prepare_items() */
 				add_filter( 'woocommerce_shop_order_list_table_request', [ $this, 'woocommerce_custom_shop_order_orderby' ], 20 );
-				add_filter( 'woocommerce_order_list_table_prepare_items_query_args', [ $this, 'filter_admin_order_table_search_by_order_number' ] );
+				add_filter( 'woocommerce_order_list_table_prepare_items_query_args', [ $this, 'filter_admin_order_table_search_by_order_number' ], 30 );
 			} else {
 				add_filter( 'request', [ $this, 'woocommerce_custom_shop_order_orderby' ], 20 );
 			}
