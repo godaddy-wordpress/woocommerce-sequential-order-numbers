@@ -296,7 +296,7 @@ class WC_Seq_Order_Number {
 	 * @since 1.0.0
 	 *
 	 * @param int|\WC_Order $order_id order identifier or order object
-	 * @param \WP_Post|\WC_Order|null $object order or post object (depending on whether HPOS is in use or not)
+	 * @param \WP_Post|\WC_Order|array<string, mixed>null $object order or post object or post data (depending on HPOS and hook in use)
 	 */
 	public function set_sequential_order_number( $order_id = null, $object = null ) {
 		global $wpdb;
@@ -309,12 +309,6 @@ class WC_Seq_Order_Number {
 			$order        = $is_order ? wc_get_order( $object->ID ) : null;
 			$order_id     = $object->ID;
 			$order_status = $object->post_status;
-
-		} elseif ( null === $object && $order_id ) {
-
-			$order        = wc_get_order( $order_id );
-			$is_order     = $order instanceof \WC_Order;
-			$order_status = $order ? $order->get_status() : '';
 
 		} else {
 
@@ -330,7 +324,7 @@ class WC_Seq_Order_Number {
 
 		// when creating an order from the admin don't create order numbers for auto-draft orders,
 		// because these are not linked to from the admin and so difficult to delete when CPT tables are used
-		if ( $object === null || ( $is_order && ( $using_hpos || 'auto-draft' !== $order_status ) ) ) {
+		if ( $is_order && ( $using_hpos || 'auto-draft' !== $order_status ) ) {
 
 			if ( $using_hpos ) {
 				$order_number = $order ? $order->get_meta( '_order_number' ) : '';
@@ -338,7 +332,7 @@ class WC_Seq_Order_Number {
 				$order_number = get_post_meta( $order_id, '_order_number', true );
 			}
 
-			// if no order number has been assigned, this will be an empty array
+			// if no order number has been assigned, create one
 			if ( empty( $order_number ) ) {
 
 				// attempt the query up to 3 times for a much higher success rate if it fails (to avoid deadlocks)
