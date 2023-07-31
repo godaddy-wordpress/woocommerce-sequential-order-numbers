@@ -368,8 +368,9 @@ class WC_Seq_Order_Number {
 					", $wpdb->insert_id ) );
 
 					$order->update_meta_data( '_order_number', $order_number );
-					$order->save();
 				}
+
+				$order->save();
 			}
 		}
 	}
