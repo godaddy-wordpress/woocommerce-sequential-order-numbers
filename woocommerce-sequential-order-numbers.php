@@ -197,7 +197,7 @@ class WC_Seq_Order_Number {
 			if ( $this->is_hpos_enabled() ) {
 				/** @see \Automattic\WooCommerce\Internal\Admin\Orders\ListTable::prepare_items() */
 				add_filter( 'woocommerce_shop_order_list_table_request', [ $this, 'woocommerce_custom_shop_order_orderby' ], 20 );
-				add_filter('woocommerce_order_list_table_prepare_items_query_args', [ $this, 'filter_admin_order_search_by_order_number' ] );
+				add_filter( 'woocommerce_order_list_table_prepare_items_query_args', [ $this, 'filter_admin_order_table_search_by_order_number' ] );
 			} else {
 				add_filter( 'request', [ $this, 'woocommerce_custom_shop_order_orderby' ], 20 );
 			}
@@ -425,15 +425,15 @@ class WC_Seq_Order_Number {
 	 * @param array<string, mixed>|mixed $order_args
 	 * @return array<string, mixed>|mixed
 	 */
-	public function filter_admin_order_search_by_order_number( $order_args ) {
+	public function filter_admin_order_table_search_by_order_number( $order_args ) {
 
 		if ( ! is_array( $order_args ) ) {
 			return $order_args;
 		}
 
-		if (isset($order_args['s']) && is_numeric($order_args['s'])) {
+		if ( isset( $order_args['s'] ) && is_numeric( $order_args['s'] ) ) {
 
-			$order = wc_get_order([
+			$order = wc_get_order( [
 				'fields'     => 'ids',
 				'limit'      => 1,
 				'meta_query' => [
@@ -441,10 +441,10 @@ class WC_Seq_Order_Number {
 					'value'   => (int) $order_args['s'],
 					'compare' => '='
 				]
-			]);
+			] );
 
 			// if we find an order matching the order number from search, let's use this order ID instead
-			if ($order) {
+			if ( $order ) {
 				$order_args['s'] = $order[0];
 			}
 		}
