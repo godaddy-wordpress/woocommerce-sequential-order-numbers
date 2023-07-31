@@ -471,7 +471,7 @@ class WC_Seq_Order_Number {
 	 */
 	public function custom_search_fields( $search_fields ) {
 
-		return array_merge( (array) $search_fields, [ '_order_number', 'order_number' ] );
+		return array_merge( (array) $search_fields, [ '_order_number' ] );
 	}
 
 
