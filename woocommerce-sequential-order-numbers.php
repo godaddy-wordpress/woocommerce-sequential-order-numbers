@@ -356,20 +356,8 @@ class WC_Seq_Order_Number {
 					", (int) $order_id ) );
 				}
 
-				// With HPOS we need to trigger a save to update the order number or it won't persist by using the direct query above alone.
-				// This may have the effect of creating 2 identical order number meta entries for an order but this seems to work nonetheless.
-				if ( $success && $using_hpos ) {
-
-					$meta_id_col  = 'id';
-					$order_number = $wpdb->get_var( $wpdb->prepare( "
-						SELECT meta_value
-						FROM {$order_meta_table}
-						WHERE {$meta_id_col} = %d
-					", $wpdb->insert_id ) );
-
-					$order->update_meta_data( '_order_number', $order_number );
-					$order->save();
-				}
+				// with HPOS we need to trigger a save to update the order number, otherwise it won't persist by using the direct query above alone
+				$order->save();
 			}
 		}
 	}
