@@ -231,9 +231,7 @@ class WC_Seq_Order_Number {
 
 
 	/**
-	 * Search for an order with order_number $order_number
-	 *
-	 * @internal
+	 * Search for an order having a given order number.
 	 *
 	 * @since 1.0.0
 	 *
