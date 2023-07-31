@@ -433,13 +433,15 @@ class WC_Seq_Order_Number {
 
 		if ( isset( $order_args['s'] ) && is_numeric( $order_args['s'] ) ) {
 
-			$order = wc_get_order( [
-				'fields'     => 'ids',
+			$order = wc_get_orders( [
+				'return'     => 'ids',
 				'limit'      => 1,
 				'meta_query' => [
-					'key'     => '_order_number',
-					'value'   => (int) $order_args['s'],
-					'compare' => '='
+					[
+						'key'     => '_order_number',
+						'value'   => $order_args['s'],
+						'compare' => '='
+					],
 				]
 			] );
 
