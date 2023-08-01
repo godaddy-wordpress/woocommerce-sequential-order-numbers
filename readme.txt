@@ -103,8 +103,8 @@ $order_number = $order->get_order_number();
 == Changelog ==
 
 - 2023.nn.nn - version 1.10.0-dev.1 =
+ * Tweak - Also set sequential order numbers for orders sent via the WooCommerce Checkout Block
  * Misc - Add compatibility for WooCommerce High Performance Order Storage (HPOS)
- * Misc - Add support for WooCommerce Checkout Block
  * Misc - Require PHP 7.4 and WordPress 5.6
 
 = 2022.07.30 - version 1.9.7 =
