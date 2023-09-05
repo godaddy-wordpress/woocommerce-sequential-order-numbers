@@ -4,7 +4,7 @@ Tags: woocommerce, order number, sequential order number, woocommerce orders
 Requires at least: 5.6
 Tested up to: 6.2.2
 Requires PHP: 7.4
-Stable tag: 1.10.0
+Stable tag: 1.10.1-dev.1
 
 This plugin extends WooCommerce by setting sequential order numbers for new orders.
 
@@ -101,6 +101,9 @@ $order_number = $order->get_order_number();
 `
 
 == Changelog ==
+
+- 2023.nn.nn - version 1.10.1-dev.1 =
+ * Fix - Call save order method only in HPOS installs to avoid setting the same order number meta twice in CPT installations
 
 - 2023.08.02 - version 1.10.0 =
  * Tweak - Also set sequential order numbers for orders sent via the WooCommerce Checkout Block

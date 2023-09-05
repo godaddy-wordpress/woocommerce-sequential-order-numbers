@@ -5,7 +5,7 @@
  * Description: Provides sequential order numbers for WooCommerce orders
  * Author: SkyVerge
  * Author URI: http://www.skyverge.com
- * Version: 1.10.0
+ * Version: 1.10.1-dev.1
  * Text Domain: woocommerce-sequential-order-numbers
  * Domain Path: /i18n/languages/
  *
@@ -33,7 +33,7 @@ class WC_Seq_Order_Number {
 
 
 	/** version number */
-	const VERSION = '1.10.0';
+	const VERSION = '1.10.1-dev.1';
 
 	/** minimum required wc version */
 	const MINIMUM_WC_VERSION = '3.9.4';
@@ -351,8 +351,11 @@ class WC_Seq_Order_Number {
 					", (int) $order_id ) );
 				}
 
-				// with HPOS we need to trigger a save to update the order number or it won't persist by using the direct query above alone
-				$order->save();
+				// with HPOS we need to trigger a save to update the order number,
+				// or it won't persist by using the direct query above alone
+				if ( $using_hpos ) {
+					$order->save();
+				}
 			}
 		}
 	}
