@@ -102,6 +102,9 @@ $order_number = $order->get_order_number();
 
 == Changelog ==
 
+- 2023.nn.nn - version 1.11. =
+
+
 - 2023.09.05 - version 1.10.1 =
  * Fix - Call save order method only in HPOS installs to avoid setting the same order number meta twice in CPT installations
 
