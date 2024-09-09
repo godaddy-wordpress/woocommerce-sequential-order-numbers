@@ -188,7 +188,7 @@ class WC_Seq_Order_Number {
 
 		// WC Subscriptions support
 		add_filter( 'wc_subscriptions_renewal_order_data', [ $this, 'subscriptions_remove_renewal_order_meta' ] );
-		add_filter( 'wcs_renewal_order_created', [ $this, 'subscriptions_set_sequential_order_number' ], 10, 2 );
+		add_filter( 'wcs_renewal_order_created', [ $this, 'subscriptions_set_sequential_order_number' ] );
 
 		// WooCommerce Admin support
 		if ( class_exists( 'Automattic\WooCommerce\Admin\Install', false ) || class_exists( 'WC_Admin_Install', false ) ) {
@@ -378,13 +378,13 @@ class WC_Seq_Order_Number {
 	 * @since 1.0.0
 	 *
 	 * @param string|int $order_number the order id with a leading hash
-	 * @param WC_Order|\WC_Subscription $order the order object
+	 * @param WC_Order|WC_Subscription $order the order object
 	 * @return string custom order number
 	 */
 	public function get_order_number( $order_number, $order ) {
 
 		// don't display an order number for subscription objects
-		if ( $order instanceof \WC_Subscription ) {
+		if ( class_exists( WC_Subscription::class ) && $order instanceof WC_Subscription ) {
 			return $order_number;
 		}
 
@@ -484,10 +484,9 @@ class WC_Seq_Order_Number {
 	 * @internal
 	 *
 	 * @param WC_Order|mixed $renewal_order the new renewal order object
-	 * @param \WC_Subscription $subscription ID of a 'shop_subscription' object, or instance of a WC_Subscription object
 	 * @return WC_Order renewal order instance
 	 */
-	public function subscriptions_set_sequential_order_number( $renewal_order, $subscription ) : WC_Order {
+	public function subscriptions_set_sequential_order_number( $renewal_order ) : WC_Order {
 
 		if ( $renewal_order instanceof WC_Order ) {
 
