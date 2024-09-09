@@ -315,6 +315,13 @@ class WC_Seq_Order_Number {
 			$order_id     = $object->ID;
 			$order_status = $object->post_status;
 
+		} else if ( $order_id instanceof WC_Order ) {
+
+			$is_order     = true;
+			$order        = $order_id;
+			$order_id     = $order->get_id();
+			$order_status = $order->get_status();
+
 		} else {
 
 			$order        = $object instanceof WC_Order ? $object : wc_get_order( (int) $order_id );
@@ -682,7 +689,7 @@ class WC_Seq_Order_Number {
 	public function render_update_notices() : void {
 
 		$message = sprintf(
-			/* translators: Placeholders: %1$s - plugin name; %2$s - WooCommerce version; %3$s, %5$s - <a> tags; %4$s - </a> tag */
+		/* translators: Placeholders: %1$s - plugin name; %2$s - WooCommerce version; %3$s, %5$s - <a> tags; %4$s - </a> tag */
 			esc_html__( '%1$s is inactive because it requires WooCommerce %2$s or newer. Please %3$supdate WooCommerce%4$s or run the %5$sWooCommerce database upgrade%4$s.', 'woocommerce-sequential-order-numbers' ),
 			'Sequential Order Numbers',
 			self::MINIMUM_WC_VERSION,
@@ -734,7 +741,7 @@ class WC_Seq_Order_Number {
 
 					wp_die(
 						sprintf(
-							/** translators: Placeholder: %s - error message(s) */
+						/** translators: Placeholder: %s - error message(s) */
 							__( 'Error activating and installing <strong>Sequential Order Numbers for WooCommerce</strong>: %s', 'woocommerce-sequential-order-numbers' ),
 							'<ul><li>' . implode( '</li><li>', $orders->get_error_messages() ) . '</li></ul>'
 						) . '<a href="' . admin_url( 'plugins.php' ) . '">' . __( '&laquo; Go Back', 'woocommerce-sequential-order-numbers' ) . '</a>'
