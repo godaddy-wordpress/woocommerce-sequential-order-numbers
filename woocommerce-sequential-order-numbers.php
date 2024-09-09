@@ -19,7 +19,7 @@
  * @license   http://www.gnu.org/licenses/gpl-3.0.html GNU General Public License v3.0
  *
  * WC requires at least: 3.9.4
- * WC tested up to: 8.0.3
+ * WC tested up to: 9.2.3
  */
 
 defined( 'ABSPATH' ) or exit;
