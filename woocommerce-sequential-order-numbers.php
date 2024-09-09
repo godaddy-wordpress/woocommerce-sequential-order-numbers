@@ -163,7 +163,7 @@ class WC_Seq_Order_Number {
 	 */
 	public function initialize() : void {
 
-		if ( ! $this->minimum_wc_version_met() ) {
+		if ( ! $this->minimum_php_version_met() || ! $this->minimum_wc_version_met() ) {
 			// halt functionality
 			return;
 		}
@@ -675,6 +675,19 @@ class WC_Seq_Order_Number {
 		}
 
 		return $version_met;
+	}
+
+
+	/**
+	 * Performs a minimum PHP version check.
+	 *
+	 * @since 1.11.0
+	 *
+	 * @return bool
+	 */
+	private function minimum_php_version_met() : bool {
+
+		return PHP_VERSION_ID >= 70400;
 	}
 
 
