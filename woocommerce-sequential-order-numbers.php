@@ -407,9 +407,9 @@ class WC_Seq_Order_Number {
 	 * @since 1.3
 	 *
 	 * @param array|mixed $vars associative array of orderby parameters
-	 * @return array associative array of orderby parameters
+	 * @return array|mixed associative array of orderby parameters
 	 */
-	public function woocommerce_custom_shop_order_orderby( $vars ) : array {
+	public function woocommerce_custom_shop_order_orderby( $vars ) {
 
 		global $typenow;
 
@@ -484,9 +484,9 @@ class WC_Seq_Order_Number {
 	 * @internal
 	 *
 	 * @param WC_Order|mixed $renewal_order the new renewal order object
-	 * @return WC_Order renewal order instance
+	 * @return WC_Order|mixed renewal order instance
 	 */
-	public function subscriptions_set_sequential_order_number( $renewal_order ) : WC_Order {
+	public function subscriptions_set_sequential_order_number( $renewal_order ) {
 
 		if ( $renewal_order instanceof WC_Order ) {
 
@@ -513,7 +513,7 @@ class WC_Seq_Order_Number {
 	 * @param string[]|mixed $order_data
 	 * @return string[]|mixed
 	 */
-	public function subscriptions_remove_renewal_order_meta( $order_data ) : array {
+	public function subscriptions_remove_renewal_order_meta( $order_data ) {
 
 		if ( ! is_array( $order_data ) ) {
 			return $order_data;
@@ -532,11 +532,15 @@ class WC_Seq_Order_Number {
 	 *
 	 * @internal
 	 *
-	 * @param array $args Arguments to be passed to WC_Order_Query.
-	 * @param WP_REST_Request $request REST API request being made.
-	 * @return array Arguments to be passed to WC_Order_Query.
+	 * @param array|mixed $args Arguments to be passed to WC_Order_Query.
+	 * @param WP_REST_Request|mixed $request REST API request being made.
+	 * @return array|mixed Arguments to be passed to WC_Order_Query.
 	 */
-	public function wc_admin_order_number_api_param( array $args, WP_REST_Request $request ) : array {
+	public function wc_admin_order_number_api_param( $args, $request ) {
+
+		if ( ! is_array( $args ) || ! $request instanceof WP_REST_Request ) {
+			return $args;
+		}
 
 		global $wpdb;
 
