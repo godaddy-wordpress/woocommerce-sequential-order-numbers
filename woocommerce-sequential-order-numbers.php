@@ -220,8 +220,7 @@ class WC_Seq_Order_Number {
 		}
 
 		// Register REST API custom order number filter
-		add_filter('woocommerce_rest_orders_collection_params', [ $this, 'add_custom_order_number_query_arg' ], 10, 1);
-		add_filter('woocommerce_rest_orders_prepare_object_query', [ $this, 'filter_orders_by_custom_order_number' ], 100, 2);
+		add_filter( 'woocommerce_rest_orders_collection_params', [ $this, 'add_rest_custom_order_number_query_param' ] );
 	}
 
 
@@ -476,45 +475,26 @@ class WC_Seq_Order_Number {
 		return array_merge( $search_fields, [ '_order_number' ] );
 	}
 
+
 	/**
-         * Register a custom query parameter for WooCommerce orders REST API to filter by custom order number.
+	 * Register a custom query parameter for WooCommerce orders REST API to filter by custom order number.
 	 */
-	public function add_custom_order_number_query_arg($args) {
-		$args['order_number'] = array(
-			'description' => 'Allows filtering of orders by custom order number. Example: https://example.com/wp-json/wc/v3/orders/?order_number=240222-45',
-			'type' => 'string',
-			'validate_callback' => 'is_string',
-		);
+	public function add_rest_custom_order_number_query_param( array $args ) : array {
+
+		if ( array_key_exists( 'number', $args ) ) {
+			return $args;
+		}
+
+		$args['number'] = [
+			'description'       => __( 'Allows filtering of orders by custom order number. Example: /wp-json/wc/v3/orders/?number=240222-45', 'woocommerce-sequential-order-numbers' ),
+			'sanitize_callback' => 'rest_sanitize_request_arg',
+			'type'              => 'string',
+			'validate_callback' => 'rest_validate_request_arg',
+		];
+
 		return $args;
 	}
 
-	/**
-	 * Modify the WooCommerce orders query based on the custom order number.
-	 */
-	public function filter_orders_by_custom_order_number($args, $request) {
-		if (!empty($request['order_number'])) {
-			$order_id = $this->find_order_by_order_number( $request['order_number'] );
-			// Additional check to ensure the order number matches exactly
-			if ( $order_id ) {
-				$order = wc_get_order( $order_id );
-				$actual_order_number = method_exists($order, 'get_order_number') ? $order->get_order_number() : '';
-				if ( $actual_order_number === $request['order_number'] ) {
-					$args['post__in'] = array( $order_id );
-				} else {
-					// Set an impossible condition, such as a post status that doesn't exist
-					$args['post_status'] = 'no-status';
-					$args['post__in'] = array( 0 );
-				}
-			} else {
-				// If no matching order is found
-				// Set an impossible condition, such as a post status that doesn't exist
-				$args['post_status'] = 'no-status';
-				$args['post__in'] = array( 0 );
-			}
-		}
-		return $args;
-	}
-	
 	/** 3rd Party Plugin Support ******************************************************/
 
 
