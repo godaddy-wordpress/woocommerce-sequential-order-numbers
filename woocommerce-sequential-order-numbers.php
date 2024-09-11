@@ -218,6 +218,9 @@ class WC_Seq_Order_Number {
 		if ( is_admin() && ! wp_doing_ajax() ) {
 			add_action( 'admin_init', [ $this, 'install' ] );
 		}
+
+		// Register REST API custom order number filter
+		add_filter( 'woocommerce_rest_orders_collection_params', [ $this, 'add_rest_custom_order_number_query_param' ] );
 	}
 
 
@@ -472,6 +475,25 @@ class WC_Seq_Order_Number {
 		return array_merge( $search_fields, [ '_order_number' ] );
 	}
 
+
+	/**
+	 * Register a custom query parameter for WooCommerce orders REST API to filter by custom order number.
+	 */
+	public function add_rest_custom_order_number_query_param( array $args ) : array {
+
+		if ( array_key_exists( 'number', $args ) ) {
+			return $args;
+		}
+
+		$args['number'] = [
+			'description'       => __( 'Allows filtering of orders by custom order number. Example: /wp-json/wc/v3/orders/?number=240222-45', 'woocommerce-sequential-order-numbers' ),
+			'sanitize_callback' => 'rest_sanitize_request_arg',
+			'type'              => 'string',
+			'validate_callback' => 'rest_validate_request_arg',
+		];
+
+		return $args;
+	}
 
 	/** 3rd Party Plugin Support ******************************************************/
 
