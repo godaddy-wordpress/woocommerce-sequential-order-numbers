@@ -105,6 +105,7 @@ $order_number = $order->get_order_number();
 - 2024.nn.nn - version 1.11.0 =
 * Misc - Code clean up and optimization
 * Misc - Add compatibility for WooCommerce Checkout block
+* Misc - Register REST API custom order number filter
 
 - 2023.09.05 - version 1.10.1 =
  * Fix - Call save order method only in HPOS installs to avoid setting the same order number meta twice in CPT installations
