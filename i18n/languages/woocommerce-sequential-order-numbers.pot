@@ -1,62 +1,67 @@
-# Copyright (C) 2023 SkyVerge
+# Copyright (C) 2024 SkyVerge
 # This file is distributed under the GNU General Public License v3.0.
 msgid ""
 msgstr ""
-"Project-Id-Version: Sequential Order Numbers for WooCommerce 1.10.1\n"
-"Report-Msgid-Bugs-To: "
-"https://woocommerce.com/my-account/marketplace-ticket-form/\n"
-"POT-Creation-Date: 2023-09-05 03:53:24+00:00\n"
-"MIME-Version: 1.0\n"
-"Content-Type: text/plain; charset=utf-8\n"
-"Content-Transfer-Encoding: 8bit\n"
-"PO-Revision-Date: 2023-MO-DA HO:MI+ZONE\n"
+"Project-Id-Version: Sequential Order Numbers for WooCommerce 1.11.0\n"
+"Report-Msgid-Bugs-To: https://woocommerce.com/my-account/marketplace-ticket-form/\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"POT-Creation-Date: 2024-09-13T04:25:58+00:00\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"X-Generator: WP-CLI 2.11.0\n"
+"X-Domain: woocommerce-sequential-order-numbers\n"
 
-#: woocommerce-sequential-order-numbers.php:136
-#. translators: Placeholders: %s - plugin name
-msgid "You cannot clone instances of %s."
-msgstr ""
-
-#: woocommerce-sequential-order-numbers.php:148
-#. translators: Placeholders: %s - plugin name
-msgid "You cannot unserialize instances of %s."
-msgstr ""
-
-#: woocommerce-sequential-order-numbers.php:678
-#. translators: Placeholders: %1$s - plugin name; %2$s - WooCommerce version;
-#. %3$s, %5$s - <a> tags; %4$s - </a> tag
-msgid ""
-"%1$s is inactive because it requires WooCommerce %2$s or newer. Please "
-"%3$supdate WooCommerce%4$s or run the %5$sWooCommerce database upgrade%4$s."
-msgstr ""
-
-#: woocommerce-sequential-order-numbers.php:728
-msgid ""
-"Error activating and installing <strong>Sequential Order Numbers for "
-"WooCommerce</strong>: %s"
-msgstr ""
-
-#: woocommerce-sequential-order-numbers.php:730
-msgid "&laquo; Go Back"
-msgstr ""
-
-#. Plugin Name of the plugin/theme
+#. Plugin Name of the plugin
+#: woocommerce-sequential-order-numbers.php
 msgid "Sequential Order Numbers for WooCommerce"
 msgstr ""
 
-#. Plugin URI of the plugin/theme
+#. Plugin URI of the plugin
+#: woocommerce-sequential-order-numbers.php
 msgid "http://www.skyverge.com/blog/woocommerce-sequential-order-numbers/"
 msgstr ""
 
-#. Description of the plugin/theme
+#. Description of the plugin
+#: woocommerce-sequential-order-numbers.php
 msgid "Provides sequential order numbers for WooCommerce orders"
 msgstr ""
 
-#. Author of the plugin/theme
+#. Author of the plugin
+#: woocommerce-sequential-order-numbers.php
 msgid "SkyVerge"
 msgstr ""
 
-#. Author URI of the plugin/theme
+#. Author URI of the plugin
+#: woocommerce-sequential-order-numbers.php
 msgid "http://www.skyverge.com"
+msgstr ""
+
+#. translators: Placeholders: %s - plugin name
+#: woocommerce-sequential-order-numbers.php:139
+msgid "You cannot clone instances of %s."
+msgstr ""
+
+#. translators: Placeholders: %s - plugin name
+#: woocommerce-sequential-order-numbers.php:151
+msgid "You cannot unserialize instances of %s."
+msgstr ""
+
+#: woocommerce-sequential-order-numbers.php:489
+msgid "Allows filtering of orders by custom order number. Example: /wp-json/wc/v3/orders/?number=240222-45"
+msgstr ""
+
+#. translators: Placeholders: %1$s - plugin name; %2$s - WooCommerce version; %3$s, %5$s - <a> tags; %4$s - </a> tag
+#: woocommerce-sequential-order-numbers.php:731
+msgid "%1$s is inactive because it requires WooCommerce %2$s or newer. Please %3$supdate WooCommerce%4$s or run the %5$sWooCommerce database upgrade%4$s."
+msgstr ""
+
+#: woocommerce-sequential-order-numbers.php:783
+msgid "Error activating and installing <strong>Sequential Order Numbers for WooCommerce</strong>: %s"
+msgstr ""
+
+#: woocommerce-sequential-order-numbers.php:785
+msgid "&laquo; Go Back"
 msgstr ""
