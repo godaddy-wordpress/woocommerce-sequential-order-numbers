@@ -5,7 +5,7 @@
  * Description: Provides sequential order numbers for WooCommerce orders
  * Author: SkyVerge
  * Author URI: http://www.skyverge.com
- * Version: 1.10.1
+ * Version: 1.11.0-dev.1
  * Text Domain: woocommerce-sequential-order-numbers
  * Domain Path: /i18n/languages/
  *
@@ -19,8 +19,11 @@
  * @license   http://www.gnu.org/licenses/gpl-3.0.html GNU General Public License v3.0
  *
  * WC requires at least: 3.9.4
- * WC tested up to: 8.0.3
+ * WC tested up to: 9.2.3
  */
+
+use Automattic\WooCommerce\Utilities\FeaturesUtil;
+use Automattic\WooCommerce\Utilities\OrderUtil;
 
 defined( 'ABSPATH' ) or exit;
 
@@ -32,17 +35,17 @@ if ( ! WC_Seq_Order_Number::is_plugin_active( 'woocommerce.php' ) ) {
 class WC_Seq_Order_Number {
 
 
-	/** version number */
-	const VERSION = '1.10.1';
+	/** Version number */
+	public const VERSION = '1.11.0-dev.1';
 
-	/** minimum required wc version */
-	const MINIMUM_WC_VERSION = '3.9.4';
+	/** Minimum required wc version */
+	public const MINIMUM_WC_VERSION = '3.9.4';
 
-	/** @var \WC_Seq_Order_Number single instance of this plugin */
-	protected static $instance;
+	/** @var WC_Seq_Order_Number single instance of this plugin */
+	protected static WC_Seq_Order_Number $instance;
 
 	/** version option name */
-	const VERSION_OPTION_NAME = 'woocommerce_seq_order_number_db_version';
+	public const VERSION_OPTION_NAME = 'woocommerce_seq_order_number_db_version';
 
 
 	/**
@@ -53,7 +56,7 @@ class WC_Seq_Order_Number {
 	public function __construct() {
 
 		add_action( 'plugins_loaded', [ $this, 'initialize' ] );
-		add_action( 'init',           [ $this, 'load_translation' ] );
+		add_action( 'init', [ $this, 'load_translation' ] );
 
 		// handle HPOS compatibility
 		add_action( 'before_woocommerce_init', [ $this, 'handle_hpos_compatibility' ] );
@@ -69,10 +72,10 @@ class WC_Seq_Order_Number {
 	 *
 	 * @return void
 	 */
-	public function handle_hpos_compatibility()
-	{
-		if ( class_exists(\Automattic\WooCommerce\Utilities\FeaturesUtil::class ) ) {
-			\Automattic\WooCommerce\Utilities\FeaturesUtil::declare_compatibility( 'custom_order_tables', plugin_basename( __FILE__ ), true );
+	public function handle_hpos_compatibility() : void {
+
+		if ( class_exists( FeaturesUtil::class ) ) {
+			FeaturesUtil::declare_compatibility( 'custom_order_tables', plugin_basename( __FILE__ ), true );
 		}
 	}
 
@@ -84,10 +87,10 @@ class WC_Seq_Order_Number {
 	 *
 	 * @return bool
 	 */
-	protected function is_hpos_enabled() {
+	protected function is_hpos_enabled() : bool {
 
-		return class_exists( \Automattic\WooCommerce\Utilities\OrderUtil::class )
-			&& \Automattic\WooCommerce\Utilities\OrderUtil::custom_orders_table_usage_is_enabled();
+		return class_exists( OrderUtil::class )
+		       && OrderUtil::custom_orders_table_usage_is_enabled();
 	}
 
 
@@ -98,9 +101,9 @@ class WC_Seq_Order_Number {
 	 *
 	 * @return bool
 	 */
-	protected function is_orders_screen() {
+	protected function is_orders_screen() : bool {
 
-		$current_screen = function_exists( 'get_current_screen') ? get_current_screen() : null;
+		$current_screen = function_exists( 'get_current_screen' ) ? get_current_screen() : null;
 
 		if ( ! $current_screen ) {
 			return false;
@@ -112,16 +115,16 @@ class WC_Seq_Order_Number {
 			return 'edit-shop_order' === $current_screen->id;
 		}
 
-		if ( is_callable( \Automattic\WooCommerce\Utilities\OrderUtil::class . '::get_order_admin_screen' ) ) {
-			$orders_screen_id = \Automattic\WooCommerce\Utilities\OrderUtil::get_order_admin_screen();
+		if ( is_callable( OrderUtil::class . '::get_order_admin_screen' ) ) {
+			$orders_screen_id = OrderUtil::get_order_admin_screen();
 		} else {
 			$orders_screen_id = function_exists( 'wc_get_page_screen_id' ) ? wc_get_page_screen_id( 'shop-order' ) : null;
 		}
 
 		return $orders_screen_id === $current_screen->id
-			&& isset( $_GET['page'] )
-			&& $_GET['page'] === 'wc-orders'
-			&& ( ! isset( $_GET['action'] ) || ! in_array( $_GET['action'], [ 'new', 'edit' ], true ) );
+		       && isset( $_GET['page'] )
+		       && $_GET['page'] === 'wc-orders'
+		       && ( ! isset( $_GET['action'] ) || ! in_array( $_GET['action'], [ 'new', 'edit' ], true ) );
 	}
 
 
@@ -158,9 +161,9 @@ class WC_Seq_Order_Number {
 	 *
 	 * @since 1.3.2
 	 */
-	public function initialize() {
+	public function initialize() : void {
 
-		if ( ! $this->minimum_wc_version_met() ) {
+		if ( ! $this->minimum_php_version_met() || ! $this->minimum_wc_version_met() ) {
 			// halt functionality
 			return;
 		}
@@ -170,7 +173,7 @@ class WC_Seq_Order_Number {
 			add_action( 'wp_insert_post', [ $this, 'set_sequential_order_number' ], 10, 2 );
 		} else {
 			add_action( 'woocommerce_checkout_update_order_meta', [ $this, 'set_sequential_order_number' ], 10, 2 );
-			add_action( 'woocommerce_process_shop_order_meta',    [ $this, 'set_sequential_order_number' ], 35, 2 );
+			add_action( 'woocommerce_process_shop_order_meta', [ $this, 'set_sequential_order_number' ], 35, 2 );
 			add_action( 'woocommerce_before_resend_order_emails', [ $this, 'set_sequential_order_number' ] );
 		}
 
@@ -178,18 +181,18 @@ class WC_Seq_Order_Number {
 		add_action( 'woocommerce_store_api_checkout_update_order_meta', [ $this, 'set_sequential_order_number' ], 10, 2 );
 
 		// return our custom order number for display
-		add_filter( 'woocommerce_order_number', array( $this, 'get_order_number' ), 10, 2 );
+		add_filter( 'woocommerce_order_number', [ $this, 'get_order_number' ], 10, 2 );
 
 		// order tracking page search by order number
-		add_filter( 'woocommerce_shortcode_order_tracking_order_id', array( $this, 'find_order_by_order_number' ) );
+		add_filter( 'woocommerce_shortcode_order_tracking_order_id', [ $this, 'find_order_by_order_number' ] );
 
 		// WC Subscriptions support
 		add_filter( 'wc_subscriptions_renewal_order_data', [ $this, 'subscriptions_remove_renewal_order_meta' ] );
-		add_filter( 'wcs_renewal_order_created',           [ $this, 'subscriptions_set_sequential_order_number' ], 10, 2 );
+		add_filter( 'wcs_renewal_order_created', [ $this, 'subscriptions_set_sequential_order_number' ] );
 
 		// WooCommerce Admin support
 		if ( class_exists( 'Automattic\WooCommerce\Admin\Install', false ) || class_exists( 'WC_Admin_Install', false ) ) {
-			add_filter( 'woocommerce_rest_orders_prepare_object_query', array( $this, 'wc_admin_order_number_api_param' ), 10, 2 );
+			add_filter( 'woocommerce_rest_orders_prepare_object_query', [ $this, 'wc_admin_order_number_api_param' ], 10, 2 );
 		}
 
 		if ( is_admin() ) {
@@ -203,11 +206,11 @@ class WC_Seq_Order_Number {
 
 			// ensure that admin order table search by order number works
 			add_filter( 'woocommerce_shop_order_search_fields', [ $this, 'custom_search_fields' ] );
-			add_filter( 'woocommerce_order_table_search_query_meta_keys', [ $this, 'custom_search_fields'] );
+			add_filter( 'woocommerce_order_table_search_query_meta_keys', [ $this, 'custom_search_fields' ] );
 
 			// sort by underlying _order_number on the Pre-Orders table
-			add_filter( 'wc_pre_orders_edit_pre_orders_request', array( $this, 'custom_orderby' ) );
-			add_filter( 'wc_pre_orders_search_fields',           array( $this, 'custom_search_fields' ) );
+			add_filter( 'wc_pre_orders_edit_pre_orders_request', [ $this, 'custom_orderby' ] );
+			add_filter( 'wc_pre_orders_search_fields', [ $this, 'custom_search_fields' ] );
 
 		}
 
@@ -215,6 +218,9 @@ class WC_Seq_Order_Number {
 		if ( is_admin() && ! wp_doing_ajax() ) {
 			add_action( 'admin_init', [ $this, 'install' ] );
 		}
+
+		// Register REST API custom order number filter
+		add_filter( 'woocommerce_rest_orders_collection_params', [ $this, 'add_rest_custom_order_number_query_param' ] );
 	}
 
 
@@ -225,7 +231,7 @@ class WC_Seq_Order_Number {
 	 *
 	 * @since 1.3.3
 	 */
-	public function load_translation() {
+	public function load_translation() : void {
 
 		// localization
 		load_plugin_textdomain( 'woocommerce-sequential-order-numbers', false, dirname( plugin_basename( __FILE__ ) ) . '/i18n/languages' );
@@ -237,24 +243,24 @@ class WC_Seq_Order_Number {
 	 *
 	 * @since 1.0.0
 	 *
-	 * @param string $order_number order number to search for
+	 * @param string|int $order_number order number to search for
 	 * @return int $order_id for the order identified by $order_number, or 0
 	 */
-	public function find_order_by_order_number( $order_number ) {
+	public function find_order_by_order_number( $order_number ) : int {
 
 		// search for the order by custom order number
 		if ( $this->is_hpos_enabled() ) {
-			$orders = wc_get_orders([
+			$orders = wc_get_orders( [
 				'return'     => 'ids',
 				'limit'      => 1,
 				'meta_query' => [
 					[
 						'key'        => '_order_number',
 						'value'      => $order_number,
-						'comparison' => '='
+						'comparison' => '=',
 					],
 				],
-			]);
+			] );
 		} else {
 			$orders = get_posts( [
 				'numberposts' => 1,
@@ -266,7 +272,7 @@ class WC_Seq_Order_Number {
 			] );
 		}
 
-		$order_id = $orders ? current($orders) : null;
+		$order_id = $orders ? current( $orders ) : null;
 
 		// order was found
 		if ( $order_id !== null ) {
@@ -296,25 +302,33 @@ class WC_Seq_Order_Number {
 	 *
 	 * @since 1.0.0
 	 *
-	 * @param int|\WC_Order $order_id order identifier or order object
-	 * @param \WP_Post|\WC_Order|array<string, mixed>|null $object $object order or post object or post data (depending on HPOS and hook in use)
+	 * @param int|WC_Order $order_id order identifier or order object
+	 * @param WP_Post|WC_Order|array<string, mixed>|null $object $object order or post object or post data (depending on HPOS and hook in use)
 	 */
-	public function set_sequential_order_number( $order_id = null, $object = null ) {
+	public function set_sequential_order_number( $order_id = null, $object = null ) : void {
+
 		global $wpdb;
 
 		$using_hpos = $this->is_hpos_enabled();
 
-		if ( $object instanceof \WP_Post ) {
+		if ( $object instanceof WP_Post ) {
 
 			$is_order     = 'shop_order' === $object->post_type;
 			$order        = $is_order ? wc_get_order( $object->ID ) : null;
 			$order_id     = $object->ID;
 			$order_status = $object->post_status;
 
+		} else if ( $order_id instanceof WC_Order ) {
+
+			$is_order     = true;
+			$order        = $order_id;
+			$order_id     = $order->get_id();
+			$order_status = $order->get_status();
+
 		} else {
 
-			$order        = $object instanceof \WC_Order ? $object : wc_get_order( (int) $order_id );
-			$is_order     = $order instanceof \WC_Order && 'shop_order' === $order->get_type();
+			$order        = $object instanceof WC_Order ? $object : wc_get_order( (int) $order_id );
+			$is_order     = $order instanceof WC_Order && 'shop_order' === $order->get_type();
 			$order_id     = ! $order_id && $order ? $order->get_id() : (int) $order_id;
 			$order_status = $order ? $order->get_status() : '';
 
@@ -366,18 +380,18 @@ class WC_Seq_Order_Number {
 	 *
 	 * @since 1.0.0
 	 *
-	 * @param string $order_number the order id with a leading hash
-	 * @param \WC_Order $order the order object
+	 * @param string|int $order_number the order id with a leading hash
+	 * @param WC_Order|WC_Subscription $order the order object
 	 * @return string custom order number
 	 */
 	public function get_order_number( $order_number, $order ) {
 
 		// don't display an order number for subscription objects
-		if ( $order instanceof \WC_Subscription ) {
+		if ( class_exists( WC_Subscription::class ) && $order instanceof WC_Subscription ) {
 			return $order_number;
 		}
 
-		if ( $sequential_order_number = $order->get_meta( '_order_number', true, 'edit' ) ) {
+		if ( $sequential_order_number = (string) $order->get_meta( '_order_number', true, 'edit' ) ) {
 			$order_number = $sequential_order_number;
 		}
 
@@ -395,10 +409,11 @@ class WC_Seq_Order_Number {
 	 *
 	 * @since 1.3
 	 *
-	 * @param array $vars associative array of orderby parameters
-	 * @return array associative array of orderby parameters
+	 * @param array|mixed $vars associative array of orderby parameters
+	 * @return array|mixed associative array of orderby parameters
 	 */
 	public function woocommerce_custom_shop_order_orderby( $vars ) {
+
 		global $typenow;
 
 		if ( ! is_array( $vars ) ) {
@@ -430,10 +445,10 @@ class WC_Seq_Order_Number {
 	 * @param array $args associative array of orderby parameters
 	 * @return array associative array of orderby parameters
 	 */
-	public function custom_orderby( $args ) {
+	public function custom_orderby( array $args ) : array {
 
 		// sorting
-		if ( isset( $args['orderby'] ) && 'ID' == $args['orderby'] ) {
+		if ( isset( $args['orderby'] ) && 'ID' === $args['orderby'] ) {
 
 			$args = array_merge( $args, [
 				'meta_key' => '_order_number',  // sort on numerical portion for better results
@@ -455,11 +470,30 @@ class WC_Seq_Order_Number {
 	 * @param string[] $search_fields array of order meta fields to search by
 	 * @return string[] of order meta fields to search by
 	 */
-	public function custom_search_fields( $search_fields ) {
+	public function custom_search_fields( array $search_fields ) : array {
 
-		return array_merge( (array) $search_fields, [ '_order_number' ] );
+		return array_merge( $search_fields, [ '_order_number' ] );
 	}
 
+
+	/**
+	 * Register a custom query parameter for WooCommerce orders REST API to filter by custom order number.
+	 */
+	public function add_rest_custom_order_number_query_param( array $args ) : array {
+
+		if ( array_key_exists( 'number', $args ) ) {
+			return $args;
+		}
+
+		$args['number'] = [
+			'description'       => __( 'Allows filtering of orders by custom order number. Example: /wp-json/wc/v3/orders/?number=240222-45', 'woocommerce-sequential-order-numbers' ),
+			'sanitize_callback' => 'rest_sanitize_request_arg',
+			'type'              => 'string',
+			'validate_callback' => 'rest_validate_request_arg',
+		];
+
+		return $args;
+	}
 
 	/** 3rd Party Plugin Support ******************************************************/
 
@@ -471,13 +505,12 @@ class WC_Seq_Order_Number {
 	 *
 	 * @internal
 	 *
-	 * @param \WC_Order $renewal_order the new renewal order object
-	 * @param \WC_Subscription $subscription ID of a 'shop_subscription' object, or instance of a WC_Subscription object
-	 * @return \WC_Order renewal order instance
+	 * @param WC_Order|mixed $renewal_order the new renewal order object
+	 * @return WC_Order|mixed renewal order instance
 	 */
-	public function subscriptions_set_sequential_order_number( $renewal_order, $subscription ) {
+	public function subscriptions_set_sequential_order_number( $renewal_order ) {
 
-		if ( $renewal_order instanceof \WC_Order ) {
+		if ( $renewal_order instanceof WC_Order ) {
 
 			$order = wc_get_order( $renewal_order->get_id() );
 
@@ -500,7 +533,7 @@ class WC_Seq_Order_Number {
 	 * @internal
 	 *
 	 * @param string[]|mixed $order_data
-	 * @return string[]mixed
+	 * @return string[]|mixed
 	 */
 	public function subscriptions_remove_renewal_order_meta( $order_data ) {
 
@@ -513,6 +546,7 @@ class WC_Seq_Order_Number {
 		return $order_data;
 	}
 
+
 	/**
 	 * Hook WooCommerce Admin  order number search to the meta value.
 	 *
@@ -520,11 +554,16 @@ class WC_Seq_Order_Number {
 	 *
 	 * @internal
 	 *
-	 * @param array $args Arguments to be passed to WC_Order_Query.
-	 * @param WP_REST_Request $request REST API request being made.
-	 * @return array Arguments to be passed to WC_Order_Query.
+	 * @param array|mixed $args Arguments to be passed to WC_Order_Query.
+	 * @param WP_REST_Request|mixed $request REST API request being made.
+	 * @return array|mixed Arguments to be passed to WC_Order_Query.
 	 */
 	public function wc_admin_order_number_api_param( $args, $request ) {
+
+		if ( ! is_array( $args ) || ! $request instanceof WP_REST_Request ) {
+			return $args;
+		}
+
 		global $wpdb;
 
 		if ( '/wc/v4/orders' === $request->get_route() && isset( $request['number'] ) ) {
@@ -532,11 +571,11 @@ class WC_Seq_Order_Number {
 			// Handles 'number' value here and modify $args.
 			$number_search = trim( $request['number'] );
 			$order_sql     = esc_sql( $args['order'] ); // Order defaults to DESC.
-			$limit         = intval( $args['posts_per_page'] ); // Posts per page defaults to 10.
+			$limit         = (int) $args['posts_per_page']; // Posts per page defaults to 10.
 
-			$using_hpos = $this->is_hpos_enabled();
+			$using_hpos       = $this->is_hpos_enabled();
 			$order_meta_table = $using_hpos ? $wpdb->prefix . 'wc_orders_meta' : $wpdb->postmeta;
-			$order_id_column = $using_hpos ? 'order_id' : 'post_id';
+			$order_id_column  = $using_hpos ? 'order_id' : 'post_id';
 
 			// Search Order number meta value instead of Post ID.
 			$order_ids = $wpdb->get_col(
@@ -551,9 +590,9 @@ class WC_Seq_Order_Number {
 			);
 
 			if ( $using_hpos ) {
-				$args['order__in'] = empty( $order_ids ) ? array( 0 ) : $order_ids;
+				$args['order__in'] = empty( $order_ids ) ? [ 0 ] : $order_ids;
 			} else {
-				$args['post__in'] = empty( $order_ids ) ? array( 0 ) : $order_ids;
+				$args['post__in'] = empty( $order_ids ) ? [ 0 ] : $order_ids;
 			}
 
 			// Remove the 'number' parameter to short circuit WooCommerce Admin's handling.
@@ -569,19 +608,15 @@ class WC_Seq_Order_Number {
 	/**
 	 * Main Sequential Order Numbers Instance, ensures only one instance is/can be loaded.
 	 *
-	 * @see wc_sequential_order_numbers()
-	 *
 	 * @since 1.7.0
 	 *
-	 * @return \WC_Seq_Order_Number
+	 * @return WC_Seq_Order_Number
+	 * @see wc_sequential_order_numbers()
+	 *
 	 */
-	public static function instance() {
+	public static function instance() : WC_Seq_Order_Number {
 
-		if ( null === self::$instance )  {
-			self::$instance = new self();
-		}
-
-		return self::$instance;
+		return self::$instance ??= new self();
 	}
 
 
@@ -593,22 +628,22 @@ class WC_Seq_Order_Number {
 	 * @param string $plugin_name plugin name, as the plugin-filename.php
 	 * @return boolean true if the named plugin is installed and active
 	 */
-	public static function is_plugin_active( $plugin_name ) {
+	public static function is_plugin_active( string $plugin_name ) : bool {
 
-		$active_plugins = (array) get_option( 'active_plugins', array() );
+		$active_plugins = (array) get_option( 'active_plugins', [] );
 
 		if ( is_multisite() ) {
-			$active_plugins = array_merge( $active_plugins, array_keys( get_site_option( 'active_sitewide_plugins', array() ) ) );
+			$active_plugins = array_merge( $active_plugins, array_keys( get_site_option( 'active_sitewide_plugins', [] ) ) );
 		}
 
-		$plugin_filenames = array();
+		$plugin_filenames = [];
 
 		foreach ( $active_plugins as $plugin ) {
 
 			if ( false !== strpos( $plugin, '/' ) ) {
 
 				// normal plugin name (plugin-dir/plugin-filename.php)
-				list( , $filename ) = explode( '/', $plugin );
+				[ , $filename ] = explode( '/', $plugin );
 
 			} else {
 
@@ -619,7 +654,7 @@ class WC_Seq_Order_Number {
 			$plugin_filenames[] = $filename;
 		}
 
-		return in_array( $plugin_name, $plugin_filenames );
+		return in_array( $plugin_name, $plugin_filenames, true );
 	}
 
 
@@ -633,7 +668,8 @@ class WC_Seq_Order_Number {
 	 *
 	 * @return string woocommerce version number or null
 	 */
-	private static function get_wc_version() {
+	private static function get_wc_version() : ?string {
+
 		return defined( 'WC_VERSION' ) && WC_VERSION ? WC_VERSION : null;
 	}
 
@@ -645,16 +681,20 @@ class WC_Seq_Order_Number {
 	 *
 	 * @return bool
 	 */
-	private function minimum_wc_version_met() {
+	private function minimum_wc_version_met() : bool {
 
 		$version_met = true;
 
+		if ( ! $wc_version = self::get_wc_version() ) {
+			return false;
+		}
+
 		// if a plugin defines a minimum WC version, render a notice and skip loading the plugin
-		if ( defined( 'self::MINIMUM_WC_VERSION' ) && version_compare( self::get_wc_version(), self::MINIMUM_WC_VERSION, '<' ) ) {
+		if ( version_compare( $wc_version, self::MINIMUM_WC_VERSION, '<' ) ) {
 
-			if ( is_admin() && ! wp_doing_ajax() && ! has_action( 'admin_notices', array( $this, 'render_update_notices' ) ) ) {
+			if ( is_admin() && ! wp_doing_ajax() && ! has_action( 'admin_notices', [ $this, 'render_update_notices' ] ) ) {
 
-				add_action( 'admin_notices', array( $this, 'render_update_notices' ) );
+				add_action( 'admin_notices', [ $this, 'render_update_notices' ] );
 			}
 
 			$version_met = false;
@@ -665,16 +705,29 @@ class WC_Seq_Order_Number {
 
 
 	/**
+	 * Performs a minimum PHP version check.
+	 *
+	 * @since 1.11.0
+	 *
+	 * @return bool
+	 */
+	private function minimum_php_version_met() : bool {
+
+		return PHP_VERSION_ID >= 70400;
+	}
+
+
+	/**
 	 * Renders a notice to update WooCommerce if needed
 	 *
 	 * @internal
 	 *
 	 * @since 1.3.2
 	 */
-	public function render_update_notices() {
+	public function render_update_notices() : void {
 
 		$message = sprintf(
-			/* translators: Placeholders: %1$s - plugin name; %2$s - WooCommerce version; %3$s, %5$s - <a> tags; %4$s - </a> tag */
+		/* translators: Placeholders: %1$s - plugin name; %2$s - WooCommerce version; %3$s, %5$s - <a> tags; %4$s - </a> tag */
 			esc_html__( '%1$s is inactive because it requires WooCommerce %2$s or newer. Please %3$supdate WooCommerce%4$s or run the %5$sWooCommerce database upgrade%4$s.', 'woocommerce-sequential-order-numbers' ),
 			'Sequential Order Numbers',
 			self::MINIMUM_WC_VERSION,
@@ -691,15 +744,17 @@ class WC_Seq_Order_Number {
 
 
 	/**
-	 * Run every time.  Used since the activation hook is not executed when updating a plugin
+	 * Run every time
+	 *
+	 * Used since the activation hook is not executed when updating a plugin
 	 *
 	 * @internal
 	 *
 	 * @since 1.0.0
 	 */
-	public function install() {
+	public function install() : void {
 
-		$installed_version = get_option( WC_Seq_Order_Number::VERSION_OPTION_NAME );
+		$installed_version = get_option( self::VERSION_OPTION_NAME );
 
 		if ( ! $installed_version ) {
 
@@ -714,7 +769,7 @@ class WC_Seq_Order_Number {
 				$orders = wc_get_orders( [
 					'type'   => 'shop_order',
 					'offset' => $offset,
-					'limit'  => $orders_par_page
+					'limit'  => $orders_par_page,
 				] );
 
 				// some sort of bad database error: deactivate the plugin and display an error
@@ -724,7 +779,7 @@ class WC_Seq_Order_Number {
 
 					wp_die(
 						sprintf(
-							/** translators: Placeholder: %s - error message(s) */
+						/** translators: Placeholder: %s - error message(s) */
 							__( 'Error activating and installing <strong>Sequential Order Numbers for WooCommerce</strong>: %s', 'woocommerce-sequential-order-numbers' ),
 							'<ul><li>' . implode( '</li><li>', $orders->get_error_messages() ) . '</li></ul>'
 						) . '<a href="' . admin_url( 'plugins.php' ) . '">' . __( '&laquo; Go Back', 'woocommerce-sequential-order-numbers' ) . '</a>'
@@ -732,10 +787,10 @@ class WC_Seq_Order_Number {
 
 				} elseif ( is_array( $orders ) ) {
 
-					foreach( $orders as $order ) {
+					foreach ( $orders as $order ) {
 
-						if ( '' === $order->get_meta( '_order_number', true ) ) {
-							$order->add_meta_data('_order_number', (string) $order->get_id() );
+						if ( '' === $order->get_meta( '_order_number' ) ) {
+							$order->add_meta_data( '_order_number', (string) $order->get_id() );
 							$order->save_meta_data();
 						}
 					}
@@ -749,12 +804,12 @@ class WC_Seq_Order_Number {
 			} while ( count( $orders ) === $orders_par_page );  // while full set of results returned  (meaning there may be more results still to retrieve)
 		}
 
-		if ( $installed_version !== WC_Seq_Order_Number::VERSION ) {
+		if ( $installed_version !== self::VERSION ) {
 
 			$this->upgrade( $installed_version );
 
 			// new version number
-			update_option( WC_Seq_Order_Number::VERSION_OPTION_NAME, WC_Seq_Order_Number::VERSION );
+			update_option( self::VERSION_OPTION_NAME, self::VERSION );
 		}
 	}
 
@@ -766,7 +821,7 @@ class WC_Seq_Order_Number {
 	 *
 	 * @param string $installed_version
 	 */
-	private function upgrade( $installed_version ) {
+	private function upgrade( string $installed_version ) : void {
 		// upgrade code goes here
 	}
 
@@ -779,9 +834,10 @@ class WC_Seq_Order_Number {
  *
  * @since 1.7.0
  *
- * @return \WC_Seq_Order_Number
+ * @return WC_Seq_Order_Number
  */
-function wc_sequential_order_numbers() {
+function wc_sequential_order_numbers() : WC_Seq_Order_Number {
+
 	return WC_Seq_Order_Number::instance();
 }
 
