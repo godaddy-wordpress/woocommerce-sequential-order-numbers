@@ -2,40 +2,35 @@
 # This file is distributed under the GNU General Public License v3.0.
 msgid ""
 msgstr ""
-"Project-Id-Version: Sequential Order Numbers for WooCommerce 1.11.0\n"
+"Project-Id-Version: Sequential Order Numbers for WooCommerce 1.11.0-dev.1\n"
 "Report-Msgid-Bugs-To: https://woocommerce.com/my-account/marketplace-ticket-form/\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2024-09-13T04:25:58+00:00\n"
+"POT-Creation-Date: 2024-11-06T07:48:54+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
-"X-Generator: WP-CLI 2.11.0\n"
+"X-Generator: WP-CLI 2.6.0\n"
 "X-Domain: woocommerce-sequential-order-numbers\n"
 
 #. Plugin Name of the plugin
-#: woocommerce-sequential-order-numbers.php
 msgid "Sequential Order Numbers for WooCommerce"
 msgstr ""
 
 #. Plugin URI of the plugin
-#: woocommerce-sequential-order-numbers.php
 msgid "http://www.skyverge.com/blog/woocommerce-sequential-order-numbers/"
 msgstr ""
 
 #. Description of the plugin
-#: woocommerce-sequential-order-numbers.php
 msgid "Provides sequential order numbers for WooCommerce orders"
 msgstr ""
 
 #. Author of the plugin
-#: woocommerce-sequential-order-numbers.php
 msgid "SkyVerge"
 msgstr ""
 
 #. Author URI of the plugin
-#: woocommerce-sequential-order-numbers.php
 msgid "http://www.skyverge.com"
 msgstr ""
 
