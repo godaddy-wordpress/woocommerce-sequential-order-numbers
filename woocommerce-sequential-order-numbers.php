@@ -5,7 +5,7 @@
  * Description: Provides sequential order numbers for WooCommerce orders
  * Author: SkyVerge
  * Author URI: http://www.skyverge.com
- * Version: 1.11.1-dev.1
+ * Version: 1.11.1
  * Text Domain: woocommerce-sequential-order-numbers
  * Domain Path: /i18n/languages/
  *
@@ -19,7 +19,7 @@
  * @license   http://www.gnu.org/licenses/gpl-3.0.html GNU General Public License v3.0
  *
  * WC requires at least: 3.9.4
- * WC tested up to: 9.3.3
+ * WC tested up to: 9.8.4
  */
 
 use Automattic\WooCommerce\Internal\DataStores\Orders\CustomOrdersTableController;
@@ -38,7 +38,7 @@ class WC_Seq_Order_Number {
 
 
 	/** Version number */
-	public const VERSION = '1.11.1-dev.1';
+	public const VERSION = '1.11.1';
 
 	/** Minimum required wc version */
 	public const MINIMUM_WC_VERSION = '3.9.4';
