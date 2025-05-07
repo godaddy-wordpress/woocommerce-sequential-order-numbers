@@ -105,6 +105,7 @@ $order_number = $order->get_order_number();
 == Changelog ==
 
 = 2025.nn.nn - version 1.11.1-dev.1 =
+ * Fix - Searching by order number not working when Full Text Search is enabled
 
 = 2024.11.06 - version 1.11.0 =
  * Misc - Code clean up and optimization
