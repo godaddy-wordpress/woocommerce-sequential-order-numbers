@@ -22,6 +22,8 @@
  * WC tested up to: 9.3.3
  */
 
+use Automattic\WooCommerce\Internal\DataStores\Orders\CustomOrdersTableController;
+use Automattic\WooCommerce\Internal\DataStores\Orders\OrdersTableQuery;
 use Automattic\WooCommerce\Utilities\FeaturesUtil;
 use Automattic\WooCommerce\Utilities\OrderUtil;
 
@@ -207,6 +209,9 @@ class WC_Seq_Order_Number {
 			// ensure that admin order table search by order number works
 			add_filter( 'woocommerce_shop_order_search_fields', [ $this, 'custom_search_fields' ] );
 			add_filter( 'woocommerce_order_table_search_query_meta_keys', [ $this, 'custom_search_fields' ] );
+
+			// admin order table search when using full text
+			add_filter('woocommerce_hpos_generate_where_for_search_filter', [$this, 'fullTextSearchFilterWhereClause'], 10, 4);
 
 			// sort by underlying _order_number on the Pre-Orders table
 			add_filter( 'wc_pre_orders_edit_pre_orders_request', [ $this, 'custom_orderby' ] );
@@ -473,6 +478,49 @@ class WC_Seq_Order_Number {
 	public function custom_search_fields( array $search_fields ) : array {
 
 		return array_merge( $search_fields, [ '_order_number' ] );
+	}
+
+	/**
+	 * When Full Text Search is enabled, {@see \Automattic\WooCommerce\Internal\DataStores\Orders\OrdersTableSearchQuery::generate_where_for_meta_table()}
+	 * doesn't run, which means our order ID meta field doesn't get searched. This method is responsible for reproducing that
+	 * method specifically when FTS is enabled.
+	 *
+	 * @param string|mixed $whereClause
+	 * @param string|mixed $searchTerm
+	 * @param string|mixed $searchFilter
+	 * @param OrdersTableQuery|mixed $query
+	 * @return string|mixed
+	 */
+	public function fullTextSearchFilterWhereClause($whereClause, $searchTerm, $searchFilter, $query)
+	{
+		try {
+			$ftsIsEnabled = get_option(CustomOrdersTableController::HPOS_FTS_INDEX_OPTION) === 'yes' && get_option(CustomOrdersTableController::HPOS_FTS_ORDER_ITEM_INDEX_CREATED_OPTION) === 'yes';
+			if (! $ftsIsEnabled) {
+				return $whereClause;
+			}
+
+			if ($searchFilter !== 'order_id') {
+				return $whereClause;
+			}
+
+			global $wpdb;
+			$order_table = $query->get_table_name('orders');
+			$meta_table = $query->get_table_name('meta');
+
+			$meta_sub_query = $wpdb->prepare(
+			"SELECT search_query_meta.order_id
+					FROM $meta_table as search_query_meta
+					WHERE search_query_meta.meta_key = '_order_number'
+					AND search_query_meta.meta_value LIKE %s
+					GROUP BY search_query_meta.order_id
+					",
+				'%' . $wpdb->esc_like($searchTerm) . '%'
+			);
+
+			return "`$order_table`.id IN ( $meta_sub_query ) ";
+		} catch(Exception $e) {
+			return $whereClause;
+		}
 	}
 
 
