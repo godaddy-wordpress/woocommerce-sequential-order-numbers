@@ -4,7 +4,7 @@ Tags: woocommerce, order number, sequential order number, woocommerce orders
 Requires at least: 5.6
 Tested up to: 6.8
 Requires PHP: 7.4
-Stable tag: 1.11.0
+Stable tag: 1.11.1-dev.1
 License: GPLv3 or later
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
 
@@ -103,6 +103,9 @@ $order_number = $order->get_order_number();
 `
 
 == Changelog ==
+
+= 2025.nn.nn - version 1.11.1-dev.1 =
+ * Fix - Searching by order number not working when Full Text Search is enabled
 
 = 2024.11.06 - version 1.11.0 =
  * Misc - Code clean up and optimization
