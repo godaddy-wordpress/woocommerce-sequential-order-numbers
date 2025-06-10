@@ -207,6 +207,7 @@ class WC_Seq_Order_Number {
 			}
 
 			// ensure that admin order table search by order number works
+			add_filter('woocommerce_hpos_admin_search_filters', [$this, 'addOrderNumberSearchFilter']);
 			add_filter( 'woocommerce_shop_order_search_fields', [ $this, 'custom_search_fields' ] );
 			add_filter( 'woocommerce_order_table_search_query_meta_keys', [ $this, 'custom_search_fields' ] );
 
@@ -464,6 +465,46 @@ class WC_Seq_Order_Number {
 		return $args;
 	}
 
+	/**
+	 * Adds a new search filter option for the sequential order number.
+	 * 
+	 * @internal
+	 * @since 1.11.2-dev.1
+	 * 
+	 * @param array|mixed $options search options
+	 * @return array|mixed
+	 */
+	public function addOrderNumberSearchFilter($options)
+	{
+		// for now only add our custom field when using FTS
+		if (! is_array($options) || ! $this->isFullTextSearchEnabled()) {
+			return $options;	
+		}
+
+		// Insert sequential_order_number after order_id
+		$newOption = ['sequential_order_number' => __('Sequential Order Number', 'woocommerce-sequential-order-numbers')];
+		$orderIdPosition = array_search('order_id', array_keys($options));
+		if ($orderIdPosition !== false) {
+			$insertPosition = $orderIdPosition + 1;
+			$options = array_slice($options, 0, $insertPosition, true) + 
+						$newOption + 
+						array_slice($options, $insertPosition, null, true);
+		} else {
+			$options = array_merge($options, $newOption);
+		}
+
+		return $options;
+	}
+
+	/**
+	 * Determines whether full text search is enabled.
+	 * @since 1.11.2-dev.1
+	 */
+	protected function isFullTextSearchEnabled() : bool
+	{
+		return get_option(CustomOrdersTableController::HPOS_FTS_INDEX_OPTION) === 'yes' && get_option(CustomOrdersTableController::HPOS_FTS_ORDER_ITEM_INDEX_CREATED_OPTION) === 'yes';
+	}
+
 
 	/**
 	 * Add our custom `_order_number` to the set of search fields so that the admin search functionality is maintained.
@@ -493,13 +534,12 @@ class WC_Seq_Order_Number {
 	 */
 	public function fullTextSearchFilterWhereClause($whereClause, $searchTerm, $searchFilter, $query)
 	{
-		try {
-			$ftsIsEnabled = get_option(CustomOrdersTableController::HPOS_FTS_INDEX_OPTION) === 'yes' && get_option(CustomOrdersTableController::HPOS_FTS_ORDER_ITEM_INDEX_CREATED_OPTION) === 'yes';
-			if (! $ftsIsEnabled) {
-				return $whereClause;
-			}
+		if ($searchFilter !== 'sequential_order_number') {
+			return $whereClause;
+		}
 
-			if ($searchFilter !== 'order_id') {
+		try {
+			if (! $this->isFullTextSearchEnabled()) {
 				return $whereClause;
 			}
 
