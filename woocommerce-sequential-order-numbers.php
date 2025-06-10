@@ -476,8 +476,7 @@ class WC_Seq_Order_Number {
 	 */
 	public function addOrderNumberSearchFilter($options)
 	{
-		// for now only add our custom field when using FTS
-		if (! is_array($options) || ! $this->isFullTextSearchEnabled()) {
+		if (! is_array($options)) {
 			return $options;	
 		}
 
@@ -494,15 +493,6 @@ class WC_Seq_Order_Number {
 		}
 
 		return $options;
-	}
-
-	/**
-	 * Determines whether full text search is enabled.
-	 * @since 1.11.2-dev.1
-	 */
-	protected function isFullTextSearchEnabled() : bool
-	{
-		return get_option(CustomOrdersTableController::HPOS_FTS_INDEX_OPTION) === 'yes' && get_option(CustomOrdersTableController::HPOS_FTS_ORDER_ITEM_INDEX_CREATED_OPTION) === 'yes';
 	}
 
 
@@ -522,9 +512,7 @@ class WC_Seq_Order_Number {
 	}
 
 	/**
-	 * When Full Text Search is enabled, {@see \Automattic\WooCommerce\Internal\DataStores\Orders\OrdersTableSearchQuery::generate_where_for_meta_table()}
-	 * doesn't run, which means our order ID meta field doesn't get searched. This method is responsible for reproducing that
-	 * method specifically when FTS is enabled.
+	 * Generates a WHERE clause for the sequential order number search filter.
 	 *
 	 * @param string|mixed $whereClause
 	 * @param string|mixed $searchTerm
@@ -539,10 +527,6 @@ class WC_Seq_Order_Number {
 		}
 
 		try {
-			if (! $this->isFullTextSearchEnabled()) {
-				return $whereClause;
-			}
-
 			global $wpdb;
 			$order_table = $query->get_table_name('orders');
 			$meta_table = $query->get_table_name('meta');
