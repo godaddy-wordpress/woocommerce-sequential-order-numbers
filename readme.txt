@@ -104,7 +104,7 @@ $order_number = $order->get_order_number();
 
 == Changelog ==
 
-= 2025.nn.nn - version 1.11.2-dev.1 =
+= 2025.06.11 - version 1.11.2 =
  * Tweak - Add new "Sequential Order Number" option to the search order dropdown
  * Fix - Searching by order number not working when Full Text Search is enabled (previous fix did not take full effect)
 
