@@ -2,7 +2,7 @@
 Contributors: SkyVerge, maxrice, tamarazuk, chasewiseman, nekojira, beka.rice
 Tags: woocommerce, order number, sequential order number, woocommerce orders
 Requires at least: 5.6
-Tested up to: 6.8.1
+Tested up to: 6.9.1
 Requires PHP: 7.4
 Stable tag: 1.11.1
 License: GPLv3 or later
