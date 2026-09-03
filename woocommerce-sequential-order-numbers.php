@@ -177,6 +177,9 @@ class WC_Seq_Order_Number {
 			add_action( 'woocommerce_checkout_update_order_meta', [ $this, 'set_sequential_order_number' ], 10, 2 );
 			add_action( 'woocommerce_process_shop_order_meta', [ $this, 'set_sequential_order_number' ], 35, 2 );
 			add_action( 'woocommerce_before_resend_order_emails', [ $this, 'set_sequential_order_number' ] );
+
+			// orders created over the REST API are not covered by the hooks above
+			add_action( 'woocommerce_rest_insert_shop_order_object', [ $this, 'set_sequential_order_number' ], 10, 1 );
 		}
 
 		// set the custom order number on WooCommerce Checkout Block submissions
